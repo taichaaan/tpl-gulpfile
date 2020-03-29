@@ -1,6 +1,10 @@
 /**
  * gulpfile.js
- * Copyright (C) 2020 Taichi Matsutaka
+ * @creation: 200??.??.??
+ * @update  : 2020.03.29
+ * @version : 1.0.0
+ *
+ * @license Copyright (C) 2020 Taichi Matsutaka
  */
 ///////////////////////////////////////////////////////////////
 // variable
