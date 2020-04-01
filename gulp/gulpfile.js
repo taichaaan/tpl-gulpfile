@@ -1,7 +1,7 @@
 /**
  * gulpfile.js
  * @creation: 200??.??.??
- * @update  : 2020.03.29
+ * @update  : 2020.04.01
  * @version : 1.0.1
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
