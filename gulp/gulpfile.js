@@ -233,8 +233,6 @@ gulp.task('jsmin', function() {
 	gulp.src([
 			devScript + '**.js',
 			'!' + devHtml + '**/_*.js',
-			'!' + devScript + 'module.js',
-			'!' + devScript + 'common.js',
 		])
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( uglify() )
