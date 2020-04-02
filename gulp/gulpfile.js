@@ -1,7 +1,7 @@
 /**
  * gulpfile.js
  * @creation: 200??.??.??
- * @update  : 2020.04.01
+ * @update  : 2020.04.02
  * @version : 1.0.2
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
@@ -129,25 +129,6 @@ gulp.task("sass",function(){
 		.pipe( rename({suffix: '.min'}) )
 		// .pipe( sourcemaps.write('./') )
 		.pipe( gulp.dest(projectCss) );
-
-	// .css
-	// gulp.src( devSass + '**/*.scss')
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass({
-	// 		outputStyle: 'expanded',
-	// 	}) )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( gulp.dest(projectCss) );
 })
 
 
