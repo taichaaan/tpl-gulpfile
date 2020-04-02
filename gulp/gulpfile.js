@@ -110,7 +110,10 @@ gulp.task("sass",function(){
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
-			outputStyle: 'compressed'
+			outputStyle: 'compressed',
+			// outputStyle: 'expanded',
+			// indentWidth: 1,
+			// indentType : 'tab',
 		}) )
 		.pipe(header('@charset "UTF-8";\n\n'))
 		.pipe( autoprefixer({
