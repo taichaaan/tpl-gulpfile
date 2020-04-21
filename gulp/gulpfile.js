@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 200??.??.??
  * @update  : 2020.04.02
- * @version : 1.0.2
+ * @version : 1.0.3
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -15,6 +15,7 @@
 const devRoot   = '../dev_html/'; // Path to dev webroot.
 const devAssets = devRoot + 'assets' + '/'; // Path to dev assets.
 const devImg    = devAssets + 'img' + '/'; // Path to project original img.
+const devSvg    = devAssets + 'svg' + '/'; // Path to project original svg.
 const devSass   = devAssets + 'sass' + '/'; // Path to project sass.
 const devScript = devAssets + 'js' + '/'; // Path to project original js.
 const devHtml   = devRoot; // Path to project original html.
@@ -23,6 +24,7 @@ const devWp     = devRoot + 'wp' + '/'; // Path to project original wordpress.
 const projectRoot   = '../../public_html/'; // Path to project webroot.
 const projectAssets = projectRoot + 'assets' + '/'; // Path to project assets.
 const projectImg    = projectAssets + 'img' + '/'; // Path to project img.
+const projectSvg    = projectAssets + 'svg' + '/'; // Path to project svg.
 const projectCss    = projectAssets + 'css' + '/'; // Path to project css.
 const projectJs     = projectAssets + 'js' + '/'; // Path to project javascript.
 const projectHtml   = projectRoot; // Path to project HTML.
@@ -139,12 +141,11 @@ gulp.task("sass",function(){
 ///////////////////////////////////////////////////////////////
 
 // jpg,png,gif
-var priginalGlob = [devImg + '**/*.+(jpg|jpeg|png|gif)' , '!' + devHtml + '**/apng*.+(png)'  ,'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'];
+const priginalGlob = [devImg + '**/*.+(jpg|jpeg|png|gif)' , '!' + devHtml + '**/apng*.+(png)'  ,'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'];
 
-var minImgGlob = projectImg;
 gulp.task('imagemin', function(){
 	gulp.src( priginalGlob )
-	.pipe(changed( minImgGlob ))
+	.pipe(changed( projectImg ))
 		.pipe(imagemin([
 			imageminPng(),
 			imageminJpg(),
@@ -155,25 +156,33 @@ gulp.task('imagemin', function(){
 			})
 		]
 	))
-	.pipe(gulp.dest( minImgGlob ));
+	.pipe(gulp.dest( projectImg ));
 });
 
-var no_priginalGlob = devImg + '**/_*.+(jpg|jpeg|png|gif)';
+const no_priginalGlob = devImg + '**/_*.+(jpg|jpeg|png|gif)';
 gulp.task('image_nomin', function(){
 	gulp.src( no_priginalGlob )
-	.pipe(gulp.dest( minImgGlob ));
+	.pipe(gulp.dest( projectImg ));
 });
 
 
 
 // svg
-var priginalSvgGlob = devImg + '**/*.+(svg)';
-var minImgGlob = projectImg;
+const priginalImgSvgGlob = devImg + '**/*.+(svg)';
+const priginalSvgGlob = devSvg + '**/*.+(svg)';
+
+gulp.task('svgmin', function(){
+	gulp.src( priginalImgSvgGlob )
+	.pipe(changed( projectImg ))
+	.pipe(svgmin())
+	.pipe(gulp.dest( projectImg ));
+});
+
 gulp.task('svgmin', function(){
 	gulp.src( priginalSvgGlob )
-	.pipe(changed( minImgGlob ))
+	.pipe(changed( projectSvg ))
 	.pipe(svgmin())
-	.pipe(gulp.dest( minImgGlob ));
+	.pipe(gulp.dest( projectSvg ));
 });
 
 
@@ -275,6 +284,7 @@ gulp.task('watch', function() {
 	// img min
 	gulp.watch( [priginalGlob],['imagemin']);
 	gulp.watch( [no_priginalGlob],['image_nomin']);
+	gulp.watch( [priginalImgSvgGlob],['svgmin']);
 	gulp.watch( [priginalSvgGlob],['svgmin']);
 	// other
 	gulp.watch( [devMove_file],['move']);
