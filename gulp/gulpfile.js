@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
- * @creation: 200??.??.??
+ * @creation: 20018.??.??
  * @update  : 2020.04.02
- * @version : 1.0.3
+ * @version : 1.1.0
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -80,6 +80,7 @@ const uglify = require('gulp-uglify-es').default; // Compress javascript file.
 // Pug
 ///////////////////////////////////////////////////////////////
 gulp.task('pug', () => {
+	/* ----- basic ----- */
 	gulp.src( [ devHtml + '**/*.pug', '!' + devHtml + '**/_*.pug', '!' + devHtml + '**/#*.pug' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( PugBeautify({
@@ -106,6 +107,7 @@ gulp.task('pug', () => {
 // sass
 ///////////////////////////////////////////////////////////////
 gulp.task("sass",function(){
+	/* ----- basic Minifi ----- */
 	// .min.css
 	gulp.src( devSass + '**/*.scss')
 		// .pipe( sourcemaps.init() )
@@ -139,13 +141,19 @@ gulp.task("sass",function(){
 ///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
+const devImgs = [
+	devImg + '**/*.+(jpg|jpeg|png|gif)',
+	'!' + devHtml + '**/apng*.+(png)',
+	'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'
+];
+const devImgSvg = devImg + '**/*.+(svg)';
+const devSvg = devSvg + '**/*.+(svg)';
 
-// jpg,png,gif
-const priginalGlob = [devImg + '**/*.+(jpg|jpeg|png|gif)' , '!' + devHtml + '**/apng*.+(png)'  ,'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'];
 
-gulp.task('imagemin', function(){
-	gulp.src( priginalGlob )
-	.pipe(changed( projectImg ))
+/* ----- jpg,png,gif ----- */
+gulp.task('imgMinifi', function(){
+	gulp.src( devImgs )
+	.pipe( changed( projectImg ) )
 		.pipe(imagemin([
 			imageminPng(),
 			imageminJpg(),
@@ -156,33 +164,23 @@ gulp.task('imagemin', function(){
 			})
 		]
 	))
-	.pipe(gulp.dest( projectImg ));
+	.pipe( gulp.dest( projectImg ) );
 });
 
-const no_priginalGlob = devImg + '**/_*.+(jpg|jpeg|png|gif)';
-gulp.task('image_nomin', function(){
-	gulp.src( no_priginalGlob )
-	.pipe(gulp.dest( projectImg ));
+/* ----- img/*.svg ----- */
+gulp.task('imgSvgMinifi', function(){
+	gulp.src( devImgSvg )
+	.pipe( changed( projectImg ) )
+	.pipe( svgmin() )
+	.pipe( gulp.dest( projectImg ) );
 });
 
-
-
-// svg
-const priginalImgSvgGlob = devImg + '**/*.+(svg)';
-const priginalSvgGlob = devSvg + '**/*.+(svg)';
-
-gulp.task('svgmin', function(){
-	gulp.src( priginalImgSvgGlob )
-	.pipe(changed( projectImg ))
-	.pipe(svgmin())
-	.pipe(gulp.dest( projectImg ));
-});
-
-gulp.task('svgmin', function(){
-	gulp.src( priginalSvgGlob )
-	.pipe(changed( projectSvg ))
-	.pipe(svgmin())
-	.pipe(gulp.dest( projectSvg ));
+/* ----- svg/*.svg ----- */
+gulp.task('svgMinifi', function(){
+	gulp.src( devSvg )
+	.pipe( changed( projectSvg ) )
+	.pipe( svgmin() )
+	.pipe( gulp.dest( projectSvg ) );
 });
 
 
@@ -190,10 +188,10 @@ gulp.task('svgmin', function(){
 
 
 ///////////////////////////////////////////////////////////////
-// allImageMin
+// imgsMinifi
 ///////////////////////////////////////////////////////////////
-gulp.task('imgmin',
-	['imagemin','svgmin','image_nomin']
+gulp.task('imgsMinifi',
+	['imgMinifi','imgSvgMinifi','svgMinifi']
 );
 
 
@@ -203,31 +201,28 @@ gulp.task('imgmin',
 ///////////////////////////////////////////////////////////////
 // javascriptMin
 ///////////////////////////////////////////////////////////////
-gulp.task('jsmin', function() {
-	// common.js
-	// gulp.src([ devScript + 'module/*.js' , devScript + 'common.js' ])
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( concat( 'common.js' ) )
-	// 	.pipe( gulp.dest( projectJs ));
+gulp.task('jsMinifi', function() {
 
-	gulp.src( devScript + 'library/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( concat('library.js') )
-		.pipe( gulp.dest( projectJs ));
-
-
-	gulp.src( devScript + 'module/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( concat('module.js') )
-		.pipe( uglify() )
-		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectJs ));
-
+	/* ----- basic ----- */
 	gulp.src([
 			devScript + '**.js',
 			'!' + devHtml + '**/_*.js',
 		])
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( uglify() )
+		.pipe( rename({extname: '.min.js'}) )
+		.pipe( gulp.dest( projectJs ));
+
+	/* ----- library ----- */
+	gulp.src( devScript + 'library/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( concat('library.js') )
+		.pipe( gulp.dest( projectJs ));
+
+	/* ----- module ----- */
+	gulp.src( devScript + 'module/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( concat('module.js') )
 		.pipe( uglify() )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectJs ));
@@ -242,11 +237,11 @@ gulp.task('jsmin', function() {
 ///////////////////////////////////////////////////////////////
 // move
 ///////////////////////////////////////////////////////////////
-const devMove_file = [ devHtml + '**/*.+(txt|pdf|ttf|eot|woff|ico|webp)', devHtml + '**/apng*.+(png)' ];
+const devMove = [ devHtml + '**/*.+(txt|pdf|ttf|eot|woff|ico|webp)', devHtml + '**/apng*.+(png)' ];
 
 gulp.task('move', function () {
-	gulp.src( devMove_file )
-		.pipe(changed( projectHtml ))
+	gulp.src( devMove )
+		.pipe( changed( projectHtml ) )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( gulp.dest( projectHtml ) );
 });
@@ -280,14 +275,13 @@ gulp.task('watch', function() {
 	gulp.watch( [devSass + '**/*.scss'],['sass']);
 	gulp.watch( [devWp + '**/*.css'],['wp-css']);
 	// js min
-	gulp.watch( [devScript + '**/*.js'],['jsmin']);
+	gulp.watch( [devScript + '**/*.js'],['jsMinifi']);
 	// img min
-	gulp.watch( [priginalGlob],['imagemin']);
-	gulp.watch( [no_priginalGlob],['image_nomin']);
-	gulp.watch( [priginalImgSvgGlob],['svgmin']);
-	gulp.watch( [priginalSvgGlob],['svgmin']);
-	// other
-	gulp.watch( [devMove_file],['move']);
+	gulp.watch( [devImgs],['imgMinifi']);
+	gulp.watch( [devImgSvg],['imgSvgMinifi']);
+	gulp.watch( [devSvg],['svgMinifi']);
+	// move
+	gulp.watch( [devMove],['move']);
 
 
 });
@@ -296,12 +290,11 @@ gulp.task('watch', function() {
 
 
 
-
 ///////////////////////////////////////////////////////////////
 // default
 ///////////////////////////////////////////////////////////////
-gulp.task('default', ['watch','pug','sass','jsmin','imagemin','image_nomin','svgmin','move']);
-
+// gulp.task('default', ['watch','pug','sass','jsMinifi','imgMinifi','imgSvgMinifi','svgMinifi','move']);
+gulp.task('default', ['watch','pug','sass','wp-css','jsMinifi','imgsMinifi','move']);
 
 
 
