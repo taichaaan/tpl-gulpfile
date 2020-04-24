@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2020.04.02
- * @version : 1.1.0
+ * @version : 1.1.1
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -41,7 +41,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const plumber    = require('gulp-plumber'); // Do not stop watch even if an error occurs.
 const notify     = require('gulp-notify'); // Display notification on desktop.
 const rename     = require('gulp-rename'); // File rename.
-const concat     = require('gulp-concat'); // Combine multiple files.
+const concat     = require('gulp-concat'); // Combine multiple file.
 const del        = require('del');
 const header     = require('gulp-header'); // header comment
 
@@ -54,7 +54,7 @@ const gcmq         = require('gulp-group-css-media-queries');
 const cleanCSS     = require("gulp-clean-css");
 
 // Minify Images plugin.
-const changed     = require('gulp-changed'); // Check files to be updated.
+const changed     = require('gulp-changed'); // Check file to be updated.
 const imagemin    = require('gulp-imagemin'); // Compress image.
 const imageminJpg = require('imagemin-jpeg-recompress'); // Compress jpg image.
 const imageminPng = require('imagemin-pngquant'); // Compress png image.
@@ -139,20 +139,34 @@ gulp.task("sass",function(){
 
 
 ///////////////////////////////////////////////////////////////
+// wp-css
+///////////////////////////////////////////////////////////////
+const devWpCssFile = devWp + '**/*.css';
+
+gulp.task("wp-css",function(){
+	gulp.src( devWpCssFile )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( gulp.dest( projectWp ) );
+})
+
+
+
+
+///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgs = [
+const devImgFile = [
 	devImg + '**/*.+(jpg|jpeg|png|gif)',
 	'!' + devHtml + '**/apng*.+(png)',
 	'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'
 ];
-const devImgSvg = devImg + '**/*.+(svg)';
-const devSvg = devSvg + '**/*.+(svg)';
+const devImgSvgFile = devImg + '**/*.+(svg)';
+const devSvgFile    = devSvg + '**/*.+(svg)';
 
 
 /* ----- jpg,png,gif ----- */
 gulp.task('imgMinifi', function(){
-	gulp.src( devImgs )
+	gulp.src( devImgFile )
 	.pipe( changed( projectImg ) )
 		.pipe(imagemin([
 			imageminPng(),
@@ -169,7 +183,7 @@ gulp.task('imgMinifi', function(){
 
 /* ----- img/*.svg ----- */
 gulp.task('imgSvgMinifi', function(){
-	gulp.src( devImgSvg )
+	gulp.src( devImgSvgFile )
 	.pipe( changed( projectImg ) )
 	.pipe( svgmin() )
 	.pipe( gulp.dest( projectImg ) );
@@ -177,7 +191,7 @@ gulp.task('imgSvgMinifi', function(){
 
 /* ----- svg/*.svg ----- */
 gulp.task('svgMinifi', function(){
-	gulp.src( devSvg )
+	gulp.src( devSvgFile )
 	.pipe( changed( projectSvg ) )
 	.pipe( svgmin() )
 	.pipe( gulp.dest( projectSvg ) );
@@ -277,9 +291,9 @@ gulp.task('watch', function() {
 	// js min
 	gulp.watch( [devScript + '**/*.js'],['jsMinifi']);
 	// img min
-	gulp.watch( [devImgs],['imgMinifi']);
-	gulp.watch( [devImgSvg],['imgSvgMinifi']);
-	gulp.watch( [devSvg],['svgMinifi']);
+	gulp.watch( [devImgFile],['imgMinifi']);
+	gulp.watch( [devImgSvgFile],['imgSvgMinifi']);
+	gulp.watch( [devSvgFile],['svgMinifi']);
 	// move
 	gulp.watch( [devMove],['move']);
 
