@@ -251,7 +251,7 @@ gulp.task('jsMinifi', function() {
 ///////////////////////////////////////////////////////////////
 // move
 ///////////////////////////////////////////////////////////////
-const devMove = [ devHtml + '**/*.+(video|mov|txt|pdf|ttf|eot|woff|woff2|ico|webp)', devHtml + '**/apng*.+(png)' ];
+const devMove = [ devHtml + '**/*.+(mp4|mov|txt|pdf|ttf|eot|woff|woff2|ico|webp)', devHtml + '**/apng*.+(png)' ];
 
 gulp.task('move', function () {
 	gulp.src( devMove )
