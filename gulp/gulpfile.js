@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2020.05.18
- * @version : 1.2.0
+ * @update  : 2020.05.19
+ * @version : 1.2.1
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -251,7 +251,7 @@ gulp.task('jsMinifi', function() {
 ///////////////////////////////////////////////////////////////
 // move
 ///////////////////////////////////////////////////////////////
-const devMove = [ devHtml + '**/*.+(txt|pdf|ttf|eot|woff|woff2|ico|webp)', devHtml + '**/apng*.+(png)' ];
+const devMove = [ devHtml + '**/*.+(video|mov|txt|pdf|ttf|eot|woff|woff2|ico|webp)', devHtml + '**/apng*.+(png)' ];
 
 gulp.task('move', function () {
 	gulp.src( devMove )
