@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2020.05.19
- * @version : 1.2.1
+ * @version : 1.2.2
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -114,12 +114,13 @@ gulp.task("sass",function(){
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
-			outputStyle: 'compressed',
+			// outputStyle: 'compressed',
 			// outputStyle: 'expanded',
 			// indentWidth: 1,
 			// indentType : 'tab',
 		}) )
-		.pipe(header('@charset "UTF-8";\n\n'))
+		// .pipe( header('@charset "UTF-8";\n\n') )
+		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
 			cascade: false,
