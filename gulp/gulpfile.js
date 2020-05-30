@@ -224,7 +224,7 @@ gulp.task('jsMinifi', function() {
 			'!' + devHtml + '**/_*.js',
 		])
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( uglify() )
+		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectJs ));
 
@@ -238,7 +238,7 @@ gulp.task('jsMinifi', function() {
 	gulp.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
-		.pipe( uglify() )
+		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectJs ));
 
