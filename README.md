@@ -7,6 +7,15 @@ gulpfileのテンプレートです。
 pugとphpのgulpfileを一緒にして管理することにしました。
 
 
+## node
+v14.14.0
+
+
+## gulp
+v4.0.2
+
+
+
 ## Command
 
 ### init
