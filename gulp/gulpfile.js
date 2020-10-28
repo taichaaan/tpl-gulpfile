@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2020.10.28
- * @version : 2.1.0
+ * @version : 2.1.1
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -152,7 +152,7 @@ const imgTask = ( done ) => {
 	gulp
 		.src( devImgFile )
 		.pipe( changed( projectImg ) )
-		.pipe(imagemin([
+		.pipe( imagemin([
 			imageminPng(),
 			imageminJpg(),
 			imageminGif({
@@ -205,7 +205,7 @@ exports.img = imgTask;
 const jsTask = ( done ) => {
 	/* ----- basic ----- */
 	gulp
-		.src( devScript + '!(_|#)*!(.min).js' )
+		.src( devScript + '!(_|#|*.min)*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
@@ -214,9 +214,7 @@ const jsTask = ( done ) => {
 
 	/* ----- move ----- */
 	gulp
-		.src([
-			devScript + '**.min.js',
-		])
+		.src( devScript + '**.min.js' )
 		.pipe( changed( projectScript ) )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( gulp.dest( projectScript ));
@@ -283,7 +281,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.0.0'
+		+ "\n" + '   @version : 2.1.1'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
