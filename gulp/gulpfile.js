@@ -1,7 +1,7 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2020.10.28
+ * @update  : 2020.10.24
  * @version : 2.0.0
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
@@ -26,7 +26,7 @@ const projectAssets = projectRoot + 'assets' + '/'; // Path to project assets.
 const projectImg    = projectAssets + 'img' + '/'; // Path to project img.
 const projectSvg    = projectAssets + 'svg' + '/'; // Path to project svg.
 const projectCss    = projectAssets + 'css' + '/'; // Path to project css.
-const projectScript     = projectAssets + 'js' + '/'; // Path to project javascript.
+const projectJs     = projectAssets + 'js' + '/'; // Path to project javascript.
 const projectHtml   = projectRoot; // Path to project HTML.
 const projectWp     = projectRoot + 'wp' + '/'; // Path to project wordpress.
 
@@ -82,7 +82,7 @@ const uglify = require('gulp-uglify-es').default; // Compress javascript file.
 ///////////////////////////////////////////////////////////////
 const pugTask = () => {
 	return gulp
-		.src( devHtml + '**/!(_|#)*.pug' )
+		.src( [ devHtml + '**/*.pug', '!' + devHtml + '**/_*.pug', '!' + devHtml + '**/#*.pug' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( PugBeautify({
 			fill_tab: true,
@@ -113,10 +113,12 @@ const sassTask = () => {
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
+			// outputStyle: 'compressed',
 			// outputStyle: 'expanded',
 			// indentWidth: 1,
 			// indentType : 'tab',
 		}) )
+		// .pipe( header('@charset "UTF-8";\n\n') )
 		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
@@ -139,17 +141,35 @@ exports.sass = sassTask;
 
 
 ///////////////////////////////////////////////////////////////
+// wp-css
+///////////////////////////////////////////////////////////////
+const devWpCssFile = devWp + '**/*.css';
+
+const wpCssTask = () => {
+	return gulp
+		.src( devWpCssFile )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( gulp.dest( projectWp ) );
+}
+exports.wp_css = wpCssTask;
+
+
+
+///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgFile    = devImg + '**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
-const devWebpFile   = devImg + '!(meta)**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
-const devImgSvgFile = devImg + '**/!(_|#)*.svg';
-const devSvgFile    = devSvg + '**/!(_|#)*.svg';
+const devImgFile = [
+	devImg + '**/*.+(jpg|jpeg|png|gif)',
+	'!' + devHtml + '**/apng*.+(png)',
+	'!' + devImg + '**/_*.+(jpg|jpeg|png|gif)'
+];
+const devImgSvgFile = devImg + '**/*.+(svg)';
+const devSvgFile    = devSvg + '**/*.+(svg)';
 
 
-const imgTask = ( done ) => {
-	/* ----- jpg,png,gif ----- */
-	gulp
+/* ----- jpg,png,gif ----- */
+const imgMinifiTask = () => {
+	return gulp
 		.src( devImgFile )
 		.pipe( changed( projectImg ) )
 		.pipe(imagemin([
@@ -164,37 +184,43 @@ const imgTask = ( done ) => {
 			verbose: true
 		}) )
 		.pipe( gulp.dest( projectImg ) );
+}
+exports.imgMinifi = imgMinifiTask;
 
-
-	/* ----- img/*.svg ----- */
-	gulp
+/* ----- img/*.svg ----- */
+const imgSvgMinifiTask = () => {
+	return gulp
 		.src( devImgSvgFile )
 		.pipe( changed( projectImg ) )
 		.pipe( svgmin() )
 		.pipe( gulp.dest( projectImg ) );
+}
+exports.imgSvgMinifi = imgSvgMinifiTask;
 
-
-	/* ----- svg/*.svg ----- */
-	gulp
+/* ----- svg/*.svg ----- */
+const svgMinifiTask = () => {
+	return gulp
 		.src( devSvgFile )
 		.pipe( changed( projectSvg ) )
 		.pipe( svgmin() )
 		.pipe( gulp.dest( projectSvg ) );
+}
+exports.svgMinifi = svgMinifiTask;
 
-
-	/* ----- webp ----- */
-	gulp
-		.src( devWebpFile )
-		.pipe( changed( projectImg ) )
+/* ----- webp ----- */
+const webpTask = () => {
+	return gulp
+		.src( devImgFile )
 		.pipe( webp() )
 		.pipe( gulp.dest( projectImg ) );
-
-
-	done();
 }
+exports.webp = webpTask;
 
-exports.img = imgTask;
 
+
+exports.img = gulp.series(
+	gulp.parallel( imgMinifiTask , imgSvgMinifiTask , svgMinifiTask , webpTask )
+);
 
 
 
@@ -202,48 +228,41 @@ exports.img = imgTask;
 ///////////////////////////////////////////////////////////////
 // javascriptMin
 ///////////////////////////////////////////////////////////////
-const jsTask = ( done ) => {
-	/* ----- basic ----- */
-	gulp
-		.src( devScript + '!(_|#)*!(.min).js' )
+/* ----- basic ----- */
+const jsBasicTask = () => {
+	return gulp
+		.src([
+			devScript + '**.js',
+			'!' + devHtml + '**/_*.js',
+		])
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectJs ));
+}
 
-
-	/* ----- move ----- */
-	gulp
-		.src([
-			devScript + '**.min.js',
-		])
-		.pipe( changed( projectScript ) )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( gulp.dest( projectScript ));
-
-
-	/* ----- library ----- */
-	gulp
+/* ----- library ----- */
+const jsLibraryTask = () => {
+	return gulp
 		.src( devScript + 'library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('library.js') )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectJs ));
+}
 
-
-	/* ----- module ----- */
-	gulp
+/* ----- module ----- */
+const jsModuleTask = () => {
+	return gulp
 		.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ));
-
-	done();
+		.pipe( gulp.dest( projectJs ));
 }
 
 exports.js = gulp.series(
-	gulp.parallel( jsTask )
+	gulp.parallel( jsBasicTask , jsLibraryTask , jsModuleTask )
 );
 
 
@@ -253,11 +272,7 @@ exports.js = gulp.series(
 ///////////////////////////////////////////////////////////////
 // move
 ///////////////////////////////////////////////////////////////
-const devMove = [
-	devHtml + '**/*.+(mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
-	devHtml + '**/apng*.+(png)',
-	devHtml + '**/*.css',
-];
+const devMove = [ devHtml + '**/*.+(mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)', devHtml + '**/apng*.+(png)' ];
 
 const moveTask = () => {
 	return gulp
@@ -282,7 +297,7 @@ const watchTask = () => {
 		+ "\n" + '-- Now Watching ------------------------------------------------'
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
-		+ "\n" + '   @task    : pug,sass,js,img,move'
+		+ "\n" + '   @task    : pug,sass,wp_css,js,img,move'
 		+ "\n" + '   @version : 2.0.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
@@ -295,13 +310,15 @@ const watchTask = () => {
 
 	gulp.watch( devRoot + '**/*.pug' , gulp.parallel( pugTask ) );
 	gulp.watch( devSass + '**/*.scss' , gulp.parallel( sassTask ) );
-	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsTask ) );
-	gulp.watch( devImg + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
+	gulp.watch( devWpCssFile , gulp.parallel( wpCssTask ) );
+	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsBasicTask , jsLibraryTask , jsModuleTask ) );
+	gulp.watch( devImgFile , gulp.parallel( imgMinifiTask ) );
+	gulp.watch( devImgSvgFile , gulp.parallel( imgSvgMinifiTask ) );
+	gulp.watch( devSvgFile , gulp.parallel( svgMinifiTask ) );
+	gulp.watch( devImgFile , gulp.parallel( webpTask ) );
 	gulp.watch( devMove , gulp.parallel( moveTask ) );
 }
 exports.watch = watchTask;
-
-
 
 
 
@@ -312,8 +329,14 @@ exports.default = gulp.series(
 	gulp.series(
 		pugTask,
 		sassTask,
-		jsTask,
-		imgTask,
+		wpCssTask,
+		jsBasicTask,
+		jsLibraryTask,
+		jsModuleTask,
+		imgMinifiTask,
+		imgSvgMinifiTask,
+		webpTask,
+		svgMinifiTask,
 		moveTask,
 		watchTask,
 	)
