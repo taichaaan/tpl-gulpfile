@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2020.10.28
- * @version : 2.1.1
+ * @update  : 2020.11.01
+ * @version : 2.1.2
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -281,7 +281,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.1.1'
+		+ "\n" + '   @version : 2.1.2'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
