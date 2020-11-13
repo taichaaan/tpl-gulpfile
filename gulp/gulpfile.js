@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2020.11.01
- * @version : 2.1.2
+ * @version : 2.1.3
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -142,7 +142,7 @@ exports.sass = sassTask;
 // imageMin
 ///////////////////////////////////////////////////////////////
 const devImgFile    = devImg + '**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
-const devWebpFile   = devImg + '!(meta)**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
+const devWebpFile   = devImg + '!(meta)**/**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
 const devImgSvgFile = devImg + '**/!(_|#)*.svg';
 const devSvgFile    = devSvg + '**/!(_|#)*.svg';
 
@@ -281,7 +281,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.1.2'
+		+ "\n" + '   @version : 2.1.3'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
