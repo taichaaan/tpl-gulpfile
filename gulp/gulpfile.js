@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2020.11.01
- * @version : 2.1.3
+ * @update  : 2020.12.02
+ * @version : 2.1.4
  *
  * @license Copyright (C) 2020 Taichi Matsutaka
  */
@@ -185,7 +185,7 @@ const imgTask = ( done ) => {
 	/* ----- webp ----- */
 	gulp
 		.src( devWebpFile )
-		.pipe( changed( projectImg ) )
+		.pipe( changed( projectImg , {extension: '.webp'} ) )
 		.pipe( webp() )
 		.pipe( gulp.dest( projectImg ) );
 
