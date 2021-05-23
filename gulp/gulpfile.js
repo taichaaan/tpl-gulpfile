@@ -1,10 +1,10 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2020.12.02
- * @version : 2.1.4
+ * @update  : 2021.05.23
+ * @version : 2.2.0
  *
- * @license Copyright (C) 2020 Taichi Matsutaka
+ * @license Copyright (C) 2021 Taichi Matsutaka
  */
 ///////////////////////////////////////////////////////////////
 // variable
@@ -16,6 +16,7 @@ const devRoot   = '../dev_html/'; // Path to dev webroot.
 const devAssets = devRoot + 'assets' + '/'; // Path to dev assets.
 const devImg    = devAssets + 'img' + '/'; // Path to project original img.
 const devSvg    = devAssets + 'svg' + '/'; // Path to project original svg.
+const devSprite = devAssets + 'sprite' + '/'; // Path to project original svg.
 const devSass   = devAssets + 'sass' + '/'; // Path to project sass.
 const devScript = devAssets + 'js' + '/'; // Path to project original js.
 const devHtml   = devRoot; // Path to project original html.
@@ -25,8 +26,9 @@ const projectRoot   = '../../public_html/'; // Path to project webroot.
 const projectAssets = projectRoot + 'assets' + '/'; // Path to project assets.
 const projectImg    = projectAssets + 'img' + '/'; // Path to project img.
 const projectSvg    = projectAssets + 'svg' + '/'; // Path to project svg.
+const projectSprite = projectAssets + 'sprite' + '/'; // Path to project svg.
 const projectCss    = projectAssets + 'css' + '/'; // Path to project css.
-const projectScript     = projectAssets + 'js' + '/'; // Path to project javascript.
+const projectScript = projectAssets + 'js' + '/'; // Path to project javascript.
 const projectHtml   = projectRoot; // Path to project HTML.
 const projectWp     = projectRoot + 'wp' + '/'; // Path to project wordpress.
 
@@ -62,10 +64,15 @@ const imageminGif = require('imagemin-gifsicle'); // Compress gif image.
 const svgmin      = require('gulp-svgmin'); // Compress svg image.
 const webp        = require('gulp-webp'); // webp
 
+// Sprite svg
+const svgstore = require('gulp-svgstore'); // svgstore
+const cheerio  = require('gulp-cheerio'); // cheerio
+
 // Pug min
-const pug         = require('gulp-pug'); // pug
-const htmlComp    = require('gulp-phtml-simple-comp'); // phtml-simple-comp
-const PugBeautify = require('gulp-pug-beautify');
+const pug          = require('gulp-pug'); // pug
+const htmlComp     = require('gulp-phtml-simple-comp'); // phtml-simple-comp
+const PugBeautify  = require('gulp-pug-beautify');
+const htmlbeautify = require("gulp-html-beautify")
 
 // Minify javaScript plugin.
 const uglify = require('gulp-uglify-es').default; // Compress javascript file.
@@ -103,20 +110,16 @@ exports.pug = pugTask;
 
 
 
+
 ///////////////////////////////////////////////////////////////
 // sass
 ///////////////////////////////////////////////////////////////
-const sassTask = () => {
-	return gulp
+const sassTask = ( done ) => {
+	gulp
 		.src( devSass + '**/*.scss')
-		// .pipe( sourcemaps.init() )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
-		.pipe( sass({
-			// outputStyle: 'expanded',
-			// indentWidth: 1,
-			// indentType : 'tab',
-		}) )
+		.pipe( sass() )
 		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
@@ -129,8 +132,31 @@ const sassTask = () => {
 			]
 		}) )
 		.pipe( rename({suffix: '.min'}) )
-		// .pipe( sourcemaps.write('./') )
 		.pipe( gulp.dest(projectCss) );
+
+	// gulp
+	// 	.src( devSass + '**/*.scss')
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( bulkSass() )
+	// 	.pipe( sass({
+	// 		outputStyle: 'expanded',
+	// 		indentWidth: 1,
+	// 		indentType : 'tab',
+	// 	}) )
+	// 	.pipe( autoprefixer({
+	// 		grid: true,
+	// 		cascade: false,
+	// 		remove: true,
+	// 		overrideBrowserslist: [
+	// 			'> 1% in JP',
+	// 			'last 1 version',
+	// 			'Firefox ESR'
+	// 		]
+	// 	}) )
+	// 	.pipe( gulp.dest(projectCss) );
+
+	done();
+
 }
 exports.sass = sassTask;
 
@@ -200,6 +226,72 @@ exports.img = imgTask;
 
 
 ///////////////////////////////////////////////////////////////
+// spriteTask
+///////////////////////////////////////////////////////////////
+const devSpriteFile = devSprite + '**/!(_|#)*.svg';
+
+const spriteTask = ( done ) => {
+
+	/* ----- sprite/parts ----- */
+	/* 開発ディレクトリを使わない会社用に、public_htmlにもpartsディレクトリで圧縮した個別のsvgファイルを追加 */
+	gulp
+		.src( devSpriteFile )
+		.pipe( changed( projectSprite ) )
+		.pipe( svgmin() )
+		.pipe( gulp.dest( projectSprite + 'parts/' ) );
+
+
+	/* ----- sprite.svg ----- */
+	gulp
+		.src( devSpriteFile )
+		.pipe( changed( projectSprite ) )
+		.pipe( svgmin() )
+		.pipe( svgstore({
+			inlineSvg: true,
+		}) )
+		.pipe( cheerio({
+			run: function ($, file) {
+				// 不要なタグを削除
+				$('style,title,defs').remove();
+				// symbolタグ以外のid属性を削除
+				$('[id]:not(symbol)').removeAttr('id');
+				// Illustratorで付与される「st」または「cls」ではじまるclass属性を削除
+				$('[class^="st"],[class^="cls"]').removeAttr('class');
+				// svgタグ以外のstyle属性を削除
+				$('[style]:not(svg)').removeAttr('style');
+				// data-name属性を削除
+				$('[data-name]').removeAttr('data-name');
+				// fill属性を削除
+				$('[fill]').removeAttr('fill');
+				// svgタグにdisplay:noneを付与（読み込み時、スプライト全体を非表示にするため）
+				$('svg').attr({
+					style: 'display:none'
+				});
+			},
+			parserOptions: {
+				xmlMode: true,
+			}
+		}) )
+		/* 開発ディレクトリを使わない会社用に、svgをインデント */
+		.pipe( htmlbeautify({
+			'indent_size'          : 4,
+			'indent_char'          : '\t',
+			'max_preserve_newlines': 0,
+			'preserve_newlines'    : false,
+			'extra_liners'         : [],
+			'end_with_newline'     : true
+		}))
+		.pipe( gulp.dest( projectSprite ) );
+
+	done();
+}
+
+exports.sprite = spriteTask;
+
+
+
+
+///////////////////////////////////////////////////////////////
 // javascriptMin
 ///////////////////////////////////////////////////////////////
 const jsTask = ( done ) => {
@@ -210,6 +302,11 @@ const jsTask = ( done ) => {
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
+
+	// gulp
+	// 	.src( devScript + '!(_|#|*.min)*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( gulp.dest( projectScript ));
 
 
 	/* ----- move ----- */
@@ -236,6 +333,12 @@ const jsTask = ( done ) => {
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
+
+	// gulp
+	// 	.src( devScript + 'module/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( concat('module.js') )
+	// 	.pipe( gulp.dest( projectScript ));
 
 	done();
 }
@@ -280,8 +383,8 @@ const watchTask = () => {
 		+ "\n" + '-- Now Watching ------------------------------------------------'
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
-		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.1.3'
+		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
+		+ "\n" + '   @version : 2.2.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
@@ -295,6 +398,7 @@ const watchTask = () => {
 	gulp.watch( devSass + '**/*.scss' , gulp.parallel( sassTask ) );
 	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsTask ) );
 	gulp.watch( devImg + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
+	gulp.watch( devSprite + '**/*.svg' , gulp.parallel( spriteTask ) );
 	gulp.watch( devMove , gulp.parallel( moveTask ) );
 }
 exports.watch = watchTask;
@@ -312,6 +416,7 @@ exports.default = gulp.series(
 		sassTask,
 		jsTask,
 		imgTask,
+		spriteTask,
 		moveTask,
 		watchTask,
 	)
