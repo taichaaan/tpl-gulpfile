@@ -1,7 +1,7 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.05.23
+ * @update  : 2021.06.01
  * @version : 2.2.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
@@ -15,7 +15,6 @@
 const devRoot   = '../dev_html/'; // Path to dev webroot.
 const devAssets = devRoot + 'assets' + '/'; // Path to dev assets.
 const devImg    = devAssets + 'img' + '/'; // Path to project original img.
-const devSvg    = devAssets + 'svg' + '/'; // Path to project original svg.
 const devSprite = devAssets + 'sprite' + '/'; // Path to project original svg.
 const devSass   = devAssets + 'sass' + '/'; // Path to project sass.
 const devScript = devAssets + 'js' + '/'; // Path to project original js.
@@ -25,7 +24,6 @@ const devWp     = devRoot + 'wp' + '/'; // Path to project original wordpress.
 const projectRoot   = '../../public_html/'; // Path to project webroot.
 const projectAssets = projectRoot + 'assets' + '/'; // Path to project assets.
 const projectImg    = projectAssets + 'img' + '/'; // Path to project img.
-const projectSvg    = projectAssets + 'svg' + '/'; // Path to project svg.
 const projectSprite = projectAssets + 'sprite' + '/'; // Path to project svg.
 const projectCss    = projectAssets + 'css' + '/'; // Path to project css.
 const projectScript = projectAssets + 'js' + '/'; // Path to project javascript.
@@ -46,6 +44,7 @@ const rename     = require('gulp-rename'); // File rename.
 const concat     = require('gulp-concat'); // Combine multiple file.
 const del        = require('del');
 const header     = require('gulp-header'); // header comment
+const replace    = require('gulp-replace');
 
 
 // Sass plugin.
@@ -110,17 +109,21 @@ exports.pug = pugTask;
 
 
 
-
 ///////////////////////////////////////////////////////////////
 // sass
 ///////////////////////////////////////////////////////////////
-const sassTask = ( done ) => {
-	gulp
+const sassTask = () => {
+	return gulp
 		.src( devSass + '**/*.scss')
+		// .pipe( sourcemaps.init() )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
-		.pipe( sass() )
-		.pipe( cleanCSS() )
+		.pipe( sass({
+			outputStyle: 'expanded',
+			indentWidth: 1,
+			indentType : 'tab',
+		}) )
+		// .pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
 			cascade: false,
@@ -132,31 +135,8 @@ const sassTask = ( done ) => {
 			]
 		}) )
 		.pipe( rename({suffix: '.min'}) )
+		// .pipe( sourcemaps.write('./') )
 		.pipe( gulp.dest(projectCss) );
-
-	// gulp
-	// 	.src( devSass + '**/*.scss')
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass({
-	// 		outputStyle: 'expanded',
-	// 		indentWidth: 1,
-	// 		indentType : 'tab',
-	// 	}) )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( gulp.dest(projectCss) );
-
-	done();
-
 }
 exports.sass = sassTask;
 
@@ -170,8 +150,6 @@ exports.sass = sassTask;
 const devImgFile    = devImg + '**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
 const devWebpFile   = devImg + '!(meta)**/**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
 const devImgSvgFile = devImg + '**/!(_|#)*.svg';
-const devSvgFile    = devSvg + '**/!(_|#)*.svg';
-
 
 const imgTask = ( done ) => {
 	/* ----- jpg,png,gif ----- */
@@ -197,15 +175,23 @@ const imgTask = ( done ) => {
 		.src( devImgSvgFile )
 		.pipe( changed( projectImg ) )
 		.pipe( svgmin() )
+		.pipe( cheerio({
+			run: function ($, file) {
+				// 不要なタグ・属性を削除
+				$('title').remove();
+				$('[id]:not(symbol)').removeAttr('id');
+				$('[data-name]').removeAttr('data-name');
+			}
+		}) )
+		.pipe( replace(/cls-/g, function(){
+			const _this = this.file;
+			const src   = JSON.stringify(_this.history[0]);
+			const path = '/assets/img/';
+			const file  = src.substring( src.indexOf('.svg'), src.indexOf( path ) + path.length );
+			const id    = 'svg-' + file.replace( /\//g , '-' ) + '-';
+			return id;
+		}) )
 		.pipe( gulp.dest( projectImg ) );
-
-
-	/* ----- svg/*.svg ----- */
-	gulp
-		.src( devSvgFile )
-		.pipe( changed( projectSvg ) )
-		.pipe( svgmin() )
-		.pipe( gulp.dest( projectSvg ) );
 
 
 	/* ----- webp ----- */
@@ -299,14 +285,9 @@ const jsTask = ( done ) => {
 	gulp
 		.src( devScript + '!(_|#|*.min)*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( uglify({ output: {comments: 'some'} }) )
+		// .pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
-
-	// gulp
-	// 	.src( devScript + '!(_|#|*.min)*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( gulp.dest( projectScript ));
 
 
 	/* ----- move ----- */
@@ -330,15 +311,9 @@ const jsTask = ( done ) => {
 		.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
-		.pipe( uglify({ output: {comments: 'some'} }) )
+		// .pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
-
-	// gulp
-	// 	.src( devScript + 'module/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( concat('module.js') )
-	// 	.pipe( gulp.dest( projectScript ));
 
 	done();
 }
@@ -388,7 +363,7 @@ const watchTask = () => {
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
-		+ "\n" + '   Copyright (C) 2020 Taichi Matsutaka'
+		+ "\n" + '   Copyright (C) 2021 Taichi Matsutaka'
 		+ "\n"
 		+ "\n" + '------------------------------------------------- Now Watching --'
 		+ "\n"
