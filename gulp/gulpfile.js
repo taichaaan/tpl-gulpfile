@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.06.01
- * @version : 2.3.0
+ * @update  : 2021.06.10
+ * @version : 2.3.1
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -112,10 +112,9 @@ exports.pug = pugTask;
 ///////////////////////////////////////////////////////////////
 // sass
 ///////////////////////////////////////////////////////////////
-const sassTask = () => {
-	return gulp
+const sassTask = ( done ) => {
+	gulp
 		.src( devSass + '**/*.scss')
-		// .pipe( sourcemaps.init() )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
@@ -123,7 +122,7 @@ const sassTask = () => {
 			indentWidth: 1,
 			indentType : 'tab',
 		}) )
-		// .pipe( cleanCSS() )
+		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
 			cascade: false,
@@ -135,8 +134,31 @@ const sassTask = () => {
 			]
 		}) )
 		.pipe( rename({suffix: '.min'}) )
-		// .pipe( sourcemaps.write('./') )
 		.pipe( gulp.dest(projectCss) );
+
+	/* ----- No task runner ----- */
+	// gulp
+	// 	.src( devSass + '**/*.scss')
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( bulkSass() )
+	// 	.pipe( sass({
+	// 		outputStyle: 'expanded',
+	// 		indentWidth: 1,
+	// 		indentType : 'tab',
+	// 	}) )
+	// 	.pipe( autoprefixer({
+	// 		grid: true,
+	// 		cascade: false,
+	// 		remove: true,
+	// 		overrideBrowserslist: [
+	// 			'> 1% in JP',
+	// 			'last 1 version',
+	// 			'Firefox ESR'
+	// 		]
+	// 	}) )
+	// 	.pipe( gulp.dest(projectCss) );
+
+	done();
 }
 exports.sass = sassTask;
 
@@ -285,7 +307,7 @@ const jsTask = ( done ) => {
 	gulp
 		.src( devScript + '!(_|#|*.min)*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		// .pipe( uglify({ output: {comments: 'some'} }) )
+		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
 
@@ -311,9 +333,23 @@ const jsTask = ( done ) => {
 		.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
-		// .pipe( uglify({ output: {comments: 'some'} }) )
+		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
+
+
+	/* ----- No task runner ----- */
+	// gulp
+	// 	.src( devScript + '!(_|#|*.min)*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( gulp.dest( projectScript ));
+
+	// gulp
+	// 	.src( devScript + 'module/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( concat('module.js') )
+	// 	.pipe( gulp.dest( projectScript ));
+
 
 	done();
 }
@@ -359,7 +395,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.3.0'
+		+ "\n" + '   @version : 2.3.1'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
