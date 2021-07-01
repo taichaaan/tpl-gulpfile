@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.06.10
- * @version : 2.3.1
+ * @update  : 2021.07.01
+ * @version : 2.3.2
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -196,7 +196,11 @@ const imgTask = ( done ) => {
 	gulp
 		.src( devImgSvgFile )
 		.pipe( changed( projectImg ) )
-		.pipe( svgmin() )
+		.pipe( svgmin({
+			plugins:[{
+				removeViewBox: false //ViewBox属性を削除しない
+			}]
+		}) )
 		.pipe( cheerio({
 			run: function ($, file) {
 				// 不要なタグ・属性を削除
@@ -205,14 +209,14 @@ const imgTask = ( done ) => {
 				$('[data-name]').removeAttr('data-name');
 			}
 		}) )
-		.pipe( replace(/cls-/g, function(){
-			const _this = this.file;
-			const src   = JSON.stringify(_this.history[0]);
-			const path = '/assets/img/';
-			const file  = src.substring( src.indexOf('.svg'), src.indexOf( path ) + path.length );
-			const id    = 'svg-' + file.replace( /\//g , '-' ) + '-';
-			return id;
-		}) )
+		// .pipe( replace(/cls-/g, function(){
+		// 	const _this = this.file;
+		// 	const src   = JSON.stringify(_this.history[0]);
+		// 	const path = '/assets/img/';
+		// 	const file  = src.substring( src.indexOf('.svg'), src.indexOf( path ) + path.length );
+		// 	const id    = 'svg-' + file.replace( /\//g , '-' ) + '-';
+		// 	return id;
+		// }) )
 		.pipe( gulp.dest( projectImg ) );
 
 
@@ -253,7 +257,11 @@ const spriteTask = ( done ) => {
 	gulp
 		.src( devSpriteFile )
 		.pipe( changed( projectSprite ) )
-		.pipe( svgmin() )
+		.pipe( svgmin({
+			plugins:[{
+				removeViewBox: false //ViewBox属性を削除しない
+			}]
+		}) )
 		.pipe( svgstore({
 			inlineSvg: true,
 		}) )
@@ -395,7 +403,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.3.1'
+		+ "\n" + '   @version : 2.3.2'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
