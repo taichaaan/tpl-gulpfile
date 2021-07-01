@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2021.07.01
- * @version : 2.3.2
+ * @version : 2.4.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -335,6 +335,12 @@ const jsTask = ( done ) => {
 		.pipe( concat('library.js') )
 		.pipe( gulp.dest( projectScript ));
 
+	gulp
+		.src( devScript + 'jquery-library/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( concat('jquery-library.js') )
+		.pipe( gulp.dest( projectScript ));
+
 
 	/* ----- module ----- */
 	gulp
@@ -403,7 +409,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.3.2'
+		+ "\n" + '   @version : 2.4.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
