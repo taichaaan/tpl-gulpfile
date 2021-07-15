@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.07.01
- * @version : 2.4.0
+ * @update  : 2021.07.15
+ * @version : 2.5.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -60,7 +60,6 @@ const imagemin    = require('gulp-imagemin'); // Compress image.
 const imageminJpg = require('imagemin-jpeg-recompress'); // Compress jpg image.
 const imageminPng = require('imagemin-pngquant'); // Compress png image.
 const imageminGif = require('imagemin-gifsicle'); // Compress gif image.
-const svgmin      = require('gulp-svgmin'); // Compress svg image.
 const webp        = require('gulp-webp'); // webp
 
 // Sprite svg
@@ -196,10 +195,10 @@ const imgTask = ( done ) => {
 	gulp
 		.src( devImgSvgFile )
 		.pipe( changed( projectImg ) )
-		.pipe( svgmin({
-			plugins:[{
-				removeViewBox: false //ViewBox属性を削除しない
-			}]
+		.pipe( imagemin([
+			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
+		],{
+			verbose: true
 		}) )
 		.pipe( cheerio({
 			run: function ($, file) {
@@ -209,15 +208,8 @@ const imgTask = ( done ) => {
 				$('[data-name]').removeAttr('data-name');
 			}
 		}) )
-		// .pipe( replace(/cls-/g, function(){
-		// 	const _this = this.file;
-		// 	const src   = JSON.stringify(_this.history[0]);
-		// 	const path = '/assets/img/';
-		// 	const file  = src.substring( src.indexOf('.svg'), src.indexOf( path ) + path.length );
-		// 	const id    = 'svg-' + file.replace( /\//g , '-' ) + '-';
-		// 	return id;
-		// }) )
 		.pipe( gulp.dest( projectImg ) );
+
 
 
 	/* ----- webp ----- */
@@ -249,7 +241,11 @@ const spriteTask = ( done ) => {
 	gulp
 		.src( devSpriteFile )
 		.pipe( changed( projectSprite ) )
-		.pipe( svgmin() )
+		.pipe( imagemin([
+			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
+		],{
+			verbose: true
+		}) )
 		.pipe( gulp.dest( projectSprite + 'parts/' ) );
 
 
@@ -257,10 +253,10 @@ const spriteTask = ( done ) => {
 	gulp
 		.src( devSpriteFile )
 		.pipe( changed( projectSprite ) )
-		.pipe( svgmin({
-			plugins:[{
-				removeViewBox: false //ViewBox属性を削除しない
-			}]
+		.pipe( imagemin([
+			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
+		],{
+			verbose: true
 		}) )
 		.pipe( svgstore({
 			inlineSvg: true,
@@ -409,7 +405,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.4.0'
+		+ "\n" + '   @version : 2.5.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
