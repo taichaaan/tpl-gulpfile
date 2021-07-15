@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 20018.??.??
  * @update  : 2021.07.15
- * @version : 2.5.0
+ * @version : 2.5.1
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -206,6 +206,14 @@ const imgTask = ( done ) => {
 				$('title').remove();
 				$('[id]:not(symbol)').removeAttr('id');
 				$('[data-name]').removeAttr('data-name');
+
+				// viewboxをviewBoxに変換
+				const viewbox = $('svg').attr('viewbox');
+
+				if( viewbox ){
+					$('svg').removeAttr('viewbox');
+					$('svg').attr('viewBox',viewbox);
+				}
 			}
 		}) )
 		.pipe( gulp.dest( projectImg ) );
@@ -405,7 +413,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.5.0'
+		+ "\n" + '   @version : 2.5.1'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
