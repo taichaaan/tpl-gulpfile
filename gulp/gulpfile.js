@@ -121,7 +121,7 @@ const sassTask = ( done ) => {
 			indentWidth: 1,
 			indentType : 'tab',
 		}) )
-		// .pipe( cleanCSS() )
+		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
 			cascade: false,
@@ -346,7 +346,7 @@ const jsTask = ( done ) => {
 		.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
-		// .pipe( uglify({ output: {comments: 'some'} }) )
+		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
 
