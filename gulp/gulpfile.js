@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.07.15
- * @version : 2.5.1
+ * @update  : 2021.07.19
+ * @version : 2.5.2
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -121,7 +121,7 @@ const sassTask = ( done ) => {
 			indentWidth: 1,
 			indentType : 'tab',
 		}) )
-		.pipe( cleanCSS() )
+		// .pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
 			cascade: false,
@@ -204,16 +204,11 @@ const imgTask = ( done ) => {
 			run: function ($, file) {
 				// 不要なタグ・属性を削除
 				$('title').remove();
-				$('[id]:not(symbol)').removeAttr('id');
+				// $('[id]:not(symbol)').removeAttr('id');
 				$('[data-name]').removeAttr('data-name');
-
-				// viewboxをviewBoxに変換
-				const viewbox = $('svg').attr('viewbox');
-
-				if( viewbox ){
-					$('svg').removeAttr('viewbox');
-					$('svg').attr('viewBox',viewbox);
-				}
+			},
+			parserOptions: {
+				xmlMode: true,
 			}
 		}) )
 		.pipe( gulp.dest( projectImg ) );
@@ -351,7 +346,7 @@ const jsTask = ( done ) => {
 		.src( devScript + 'module/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
-		.pipe( uglify({ output: {comments: 'some'} }) )
+		// .pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ));
 
@@ -413,7 +408,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.5.1'
+		+ "\n" + '   @version : 2.5.2'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
