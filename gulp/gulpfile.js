@@ -168,8 +168,8 @@ exports.sass = sassTask;
 ///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgFile    = devImg + '**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
-const devWebpFile   = devImg + '!(meta)**/**/!(_|#|apng)*.+(jpg|jpeg|png|gif)';
+const devImgFile    = devImg + '**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)';
+const devWebpFile   = devImg + '**/webp-*.+(jpg|jpeg|png|gif)';
 const devImgSvgFile = devImg + '**/!(_|#)*.svg';
 
 const imgTask = ( done ) => {
@@ -220,6 +220,34 @@ const imgTask = ( done ) => {
 		.src( devWebpFile )
 		.pipe( changed( projectImg , {extension: '.webp'} ) )
 		.pipe( webp() )
+		.pipe(rename(function (path) {
+			// ファイル名から「webp-」を削除
+			var basename = path.basename;
+			var filename = basename.replace( 'webp-', '' );
+			path.basename = filename;
+		}))
+		.pipe( gulp.dest( projectImg ) );
+
+	gulp
+		.src( devWebpFile )
+		.pipe( changed( projectImg , {extension: '.webp'} ) )
+		.pipe( imagemin([
+			imageminPng(),
+			imageminJpg(),
+			imageminGif({
+				interlaced: false,
+				optimizationLevel: 3,
+				colors:180
+			})
+		],{
+			verbose: true
+		}) )
+		.pipe(rename(function (path) {
+			// ファイル名から「webp-」を削除
+			var basename = path.basename;
+			var filename = basename.replace( 'webp-', '' );
+			path.basename = filename;
+		}))
 		.pipe( gulp.dest( projectImg ) );
 
 
