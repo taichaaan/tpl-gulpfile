@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.07.19
- * @version : 2.5.2
+ * @update  : 2021.08.03
+ * @version : 2.6.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
