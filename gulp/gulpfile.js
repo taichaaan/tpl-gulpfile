@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.08.03
- * @version : 2.6.0
+ * @update  : 2021.08.17
+ * @version : 2.7.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -72,6 +72,9 @@ const htmlComp     = require('gulp-phtml-simple-comp'); // phtml-simple-comp
 const PugBeautify  = require('gulp-pug-beautify');
 const htmlbeautify = require("gulp-html-beautify")
 
+// EJS
+const ejs = require('gulp-ejs');
+
 // Minify javaScript plugin.
 const uglify = require('gulp-uglify-es').default; // Compress javascript file.
 
@@ -89,21 +92,61 @@ const pugTask = () => {
 	return gulp
 		.src( devHtml + '**/!(_|#)*.pug' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( PugBeautify({
-			fill_tab: true,
-			tab_size: 4,
-			separator_space: true
-		}) )
 		.pipe( pug({
 			pretty: true
 		}) )
-		.pipe( htmlComp() )
+		.pipe( PugBeautify({
+			fill_tab: true,
+			tab_size: 4,
+			separator_space: false
+		}) )
+		.pipe( htmlbeautify({
+			'indent_size'          : 4,
+			'indent_char'          : '\t',
+			'indent_inner_html'    : true,
+			'max_preserve_newlines': 0,
+			'preserve_newlines'    : true,
+			'max_preserve_newlines': 0,
+			'extra_liners'         : [],
+			'end_with_newline'     : true,
+			"inline"               : ['br'],
+		}))
 		.pipe( rename({
 			extname: '.php'
 		}) )
 		.pipe( gulp.dest( projectHtml ) );
 }
 exports.pug = pugTask;
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+// EJS
+///////////////////////////////////////////////////////////////
+const ejsTask = () => {
+	return gulp
+		.src( devHtml + '**/!(_|#)*.ejs' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( ejs() )
+		.pipe( htmlbeautify({
+			'indent_size'          : 4,
+			'indent_char'          : '\t',
+			'indent_inner_html'    : true,
+			'max_preserve_newlines': 0,
+			'preserve_newlines'    : true,
+			'max_preserve_newlines': 0,
+			'extra_liners'         : [],
+			'end_with_newline'     : true,
+		}))
+		.pipe( rename({
+			extname: '.php'
+		}) )
+		.pipe( gulp.dest( projectHtml ) );
+}
+exports.ejs = ejsTask;
+
 
 
 
@@ -216,17 +259,17 @@ const imgTask = ( done ) => {
 
 
 	/* ----- webp ----- */
-	gulp
-		.src( devWebpFile )
-		.pipe( changed( projectImg , {extension: '.webp'} ) )
-		.pipe( webp() )
-		.pipe(rename(function (path) {
-			// ファイル名から「webp-」を削除
-			var basename = path.basename;
-			var filename = basename.replace( 'webp-', '' );
-			path.basename = filename;
-		}))
-		.pipe( gulp.dest( projectImg ) );
+	// gulp
+	// 	.src( devWebpFile )
+	// 	.pipe( changed( projectImg , {extension: '.webp'} ) )
+	// 	.pipe( webp() )
+	// 	.pipe(rename(function (path) {
+	// 		// ファイル名から「webp-」を削除
+	// 		var basename = path.basename;
+	// 		var filename = basename.replace( 'webp-', '' );
+	// 		path.basename = filename;
+	// 	}))
+	// 	.pipe( gulp.dest( projectImg ) );
 
 	gulp
 		.src( devWebpFile )
@@ -407,9 +450,8 @@ exports.js = gulp.series(
 // move
 ///////////////////////////////////////////////////////////////
 const devMove = [
-	devHtml + '**/*.+(mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
-	devHtml + '**/apng*.+(png)',
-	devHtml + '**/*.css',
+	devHtml + '**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	devHtml + '**/!(_|#)apng*.+(png)',
 ];
 
 const moveTask = () => {
@@ -435,7 +477,7 @@ const watchTask = () => {
 		+ "\n" + '-- Now Watching ------------------------------------------------'
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
-		+ "\n" + '   @task    : pug,sass,js,img,sprite,move'
+		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
 		+ "\n" + '   @version : 2.6.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
@@ -447,6 +489,7 @@ const watchTask = () => {
 	);
 
 	gulp.watch( devRoot + '**/*.pug' , gulp.parallel( pugTask ) );
+	gulp.watch( devRoot + '**/*.ejs' , gulp.parallel( ejsTask ) );
 	gulp.watch( devSass + '**/*.scss' , gulp.parallel( sassTask ) );
 	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsTask ) );
 	gulp.watch( devImg + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
@@ -465,6 +508,7 @@ exports.watch = watchTask;
 exports.default = gulp.series(
 	gulp.series(
 		pugTask,
+		ejsTask,
 		sassTask,
 		jsTask,
 		imgTask,
@@ -473,7 +517,6 @@ exports.default = gulp.series(
 		watchTask,
 	)
 );
-
 
 
 
