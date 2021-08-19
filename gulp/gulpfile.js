@@ -259,7 +259,7 @@ const imgTask = ( done ) => {
 
 
 	/* ----- webp ----- */
-	// gulp
+	gulp
 		.src( devWebpFile )
 		.pipe( changed( projectImg , {
 			transformPath: function( newPath ) {
