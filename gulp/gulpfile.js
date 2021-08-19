@@ -260,20 +260,30 @@ const imgTask = ( done ) => {
 
 	/* ----- webp ----- */
 	// gulp
-	// 	.src( devWebpFile )
-	// 	.pipe( changed( projectImg , {extension: '.webp'} ) )
-	// 	.pipe( webp() )
-	// 	.pipe(rename(function (path) {
-	// 		// ファイル名から「webp-」を削除
-	// 		var basename = path.basename;
-	// 		var filename = basename.replace( 'webp-', '' );
-	// 		path.basename = filename;
-	// 	}))
-	// 	.pipe( gulp.dest( projectImg ) );
+		.src( devWebpFile )
+		.pipe( changed( projectImg , {
+			transformPath: function( newPath ) {
+				const path = newPath.replace( 'webp-', '' );
+				return path;
+			}
+		}) )
+		.pipe( webp() )
+		.pipe(rename(function (path) {
+			// ファイル名から「webp-」を削除
+			var basename = path.basename;
+			var filename = basename.replace( 'webp-', '' );
+			path.basename = filename;
+		}))
+		.pipe( gulp.dest( projectImg ) );
 
 	gulp
 		.src( devWebpFile )
-		.pipe( changed( projectImg , {extension: '.webp'} ) )
+		.pipe( changed( projectImg , {
+			transformPath: function( newPath ) {
+				const path = newPath.replace( 'webp-', '' );
+				return path;
+			}
+		}) )
 		.pipe( imagemin([
 			imageminPng(),
 			imageminJpg(),
