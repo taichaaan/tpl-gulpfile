@@ -1,6 +1,6 @@
 /**
  * gulpfile.js
- * @creation: 20018.??.??
+ * @creation: 2018.??.??
  * @update  : 2021.08.23
  * @version : 2.7.2
  *
