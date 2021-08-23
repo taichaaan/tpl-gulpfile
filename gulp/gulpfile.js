@@ -2,7 +2,7 @@
  * gulpfile.js
  * @creation: 2018.??.??
  * @update  : 2021.08.23
- * @version : 2.7.2
+ * @version : 2.7.3
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -179,26 +179,26 @@ const sassTask = ( done ) => {
 		.pipe( gulp.dest(projectCss) );
 
 	/* ----- No task runner ----- */
-	gulp
-		.src( devSass + '**/*.scss')
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( bulkSass() )
-		.pipe( sass({
-			outputStyle: 'expanded',
-			indentWidth: 1,
-			indentType : 'tab',
-		}) )
-		.pipe( autoprefixer({
-			grid: true,
-			cascade: false,
-			remove: true,
-			overrideBrowserslist: [
-				'> 1% in JP',
-				'last 1 version',
-				'Firefox ESR'
-			]
-		}) )
-		.pipe( gulp.dest(projectCss) );
+	// gulp
+	// 	.src( devSass + '**/*.scss')
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( bulkSass() )
+	// 	.pipe( sass({
+	// 		outputStyle: 'expanded',
+	// 		indentWidth: 1,
+	// 		indentType : 'tab',
+	// 	}) )
+	// 	.pipe( autoprefixer({
+	// 		grid: true,
+	// 		cascade: false,
+	// 		remove: true,
+	// 		overrideBrowserslist: [
+	// 			'> 1% in JP',
+	// 			'last 1 version',
+	// 			'Firefox ESR'
+	// 		]
+	// 	}) )
+	// 	.pipe( gulp.dest(projectCss) );
 
 	done();
 }
@@ -504,7 +504,7 @@ const watchTask = () => {
 	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsTask ) );
 	gulp.watch( devImg + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
 	gulp.watch( devSprite + '**/*.svg' , gulp.parallel( spriteTask ) );
-	gulp.watch( devMove , gulp.parallel( moveTask ) );
+	gulp.watch( devRoot + '**/*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)' , gulp.parallel( moveTask ) );
 }
 exports.watch = watchTask;
 
