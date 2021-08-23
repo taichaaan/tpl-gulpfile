@@ -1,8 +1,8 @@
 /**
  * gulpfile.js
  * @creation: 20018.??.??
- * @update  : 2021.08.20
- * @version : 2.7.1
+ * @update  : 2021.08.23
+ * @version : 2.7.2
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -179,26 +179,26 @@ const sassTask = ( done ) => {
 		.pipe( gulp.dest(projectCss) );
 
 	/* ----- No task runner ----- */
-	// gulp
-	// 	.src( devSass + '**/*.scss')
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass({
-	// 		outputStyle: 'expanded',
-	// 		indentWidth: 1,
-	// 		indentType : 'tab',
-	// 	}) )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( gulp.dest(projectCss) );
+	gulp
+		.src( devSass + '**/*.scss')
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( bulkSass() )
+		.pipe( sass({
+			outputStyle: 'expanded',
+			indentWidth: 1,
+			indentType : 'tab',
+		}) )
+		.pipe( autoprefixer({
+			grid: true,
+			cascade: false,
+			remove: true,
+			overrideBrowserslist: [
+				'> 1% in JP',
+				'last 1 version',
+				'Firefox ESR'
+			]
+		}) )
+		.pipe( gulp.dest(projectCss) );
 
 	done();
 }
@@ -460,7 +460,7 @@ exports.js = gulp.series(
 // move
 ///////////////////////////////////////////////////////////////
 const devMove = [
-	devHtml + '**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	devHtml + '!(_|#)**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
 	devHtml + '**/!(_|#)apng*.+(png)',
 ];
 
@@ -488,7 +488,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.7.1'
+		+ "\n" + '   @version : 2.7.2'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
