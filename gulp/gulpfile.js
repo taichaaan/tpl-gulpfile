@@ -1,8 +1,9 @@
 /**
  * gulpfile.js
+ * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.08.23
- * @version : 2.7.3
+ * @update  : 2021.08.31
+ * @version : 2.7.4
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -90,7 +91,7 @@ const uglify = require('gulp-uglify-es').default; // Compress javascript file.
 ///////////////////////////////////////////////////////////////
 const pugTask = () => {
 	return gulp
-		.src( devHtml + '**/!(_|#)*.pug' )
+		.src( [ devHtml + '!(_|#)**/**/!(_|#)*.pug' , devHtml + '!(_|#)*.pug' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( pug({
 			pretty: true
@@ -127,7 +128,7 @@ exports.pug = pugTask;
 ///////////////////////////////////////////////////////////////
 const ejsTask = () => {
 	return gulp
-		.src( devHtml + '**/!(_|#)*.ejs' )
+		.src( [ devHtml + '!(_|#)**/**/!(_|#)*.ejs' , devHtml + '!(_|#)*.ejs' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( ejs() )
 		.pipe( htmlbeautify({
@@ -156,7 +157,7 @@ exports.ejs = ejsTask;
 ///////////////////////////////////////////////////////////////
 const sassTask = ( done ) => {
 	gulp
-		.src( devSass + '**/*.scss')
+		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
@@ -180,7 +181,7 @@ const sassTask = ( done ) => {
 
 	/* ----- No task runner ----- */
 	// gulp
-	// 	.src( devSass + '**/*.scss')
+	// 	.src( [ devHtml + '!(_|#)**/**/!(_|#)*.scss' , devHtml + '!(_|#)*.scss' ] )
 	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 	// 	.pipe( bulkSass() )
 	// 	.pipe( sass({
@@ -211,9 +212,9 @@ exports.sass = sassTask;
 ///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgFile    = devImg + '**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)';
-const devWebpFile   = devImg + '**/webp-*.+(jpg|jpeg|png|gif)';
-const devImgSvgFile = devImg + '**/!(_|#)*.svg';
+const devImgFile    = [ devImg + '!(_|#)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , devImg + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
+const devWebpFile   = [ devImg + '!(_|#)**/**/webp-*.+(jpg|jpeg|png|gif)' , devImg + 'webp-*.+(jpg|jpeg|png|gif)' ];
+const devImgSvgFile = [ devImg + '!(_|#)**/**/!(_|#)*.svg' , devImg + '!(_|#)*.svg' ];
 
 const imgTask = ( done ) => {
 	/* ----- jpg,png,gif ----- */
@@ -316,7 +317,7 @@ exports.img = imgTask;
 ///////////////////////////////////////////////////////////////
 // spriteTask
 ///////////////////////////////////////////////////////////////
-const devSpriteFile = devSprite + '**/!(_|#)*.svg';
+const devSpriteFile = [ devSprite + '!(_|#)**/**/!(_|#)*.svg' , devSprite + '!(_|#)*.svg' ];
 
 const spriteTask = ( done ) => {
 
@@ -460,8 +461,10 @@ exports.js = gulp.series(
 // move
 ///////////////////////////////////////////////////////////////
 const devMove = [
-	devHtml + '!(_|#)**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
-	devHtml + '**/!(_|#)apng*.+(png)',
+	devHtml + '!(_|#)**/**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	devHtml + '!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	devHtml + '!(_|#)**/**/!(_|#)apng*.+(png)',
+	devHtml + '!(_|#)apng*.+(png)',
 ];
 
 const moveTask = () => {
@@ -488,7 +491,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.7.3'
+		+ "\n" + '   @version : 2.7.4'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
