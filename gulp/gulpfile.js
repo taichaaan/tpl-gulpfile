@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.08.31
- * @version : 2.7.4
+ * @update  : 2021.09.08
+ * @version : 2.7.5
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -158,6 +158,7 @@ exports.ejs = ejsTask;
 const sassTask = ( done ) => {
 	gulp
 		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+		// .src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
@@ -181,7 +182,7 @@ const sassTask = ( done ) => {
 
 	/* ----- No task runner ----- */
 	// gulp
-	// 	.src( [ devHtml + '!(_|#)**/**/!(_|#)*.scss' , devHtml + '!(_|#)*.scss' ] )
+	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
 	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 	// 	.pipe( bulkSass() )
 	// 	.pipe( sass({
@@ -491,7 +492,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.7.4'
+		+ "\n" + '   @version : 2.7.5'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
