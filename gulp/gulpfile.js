@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.09.08
- * @version : 2.7.5
+ * @update  : 2021.09.11
+ * @version : 2.8.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -78,6 +78,9 @@ const ejs = require('gulp-ejs');
 
 // Minify javaScript plugin.
 const uglify = require('gulp-uglify-es').default; // Compress javascript file.
+
+// Filelist
+const filelist = require('gulp-filelist');
 
 
 
@@ -157,8 +160,8 @@ exports.ejs = ejsTask;
 ///////////////////////////////////////////////////////////////
 const sassTask = ( done ) => {
 	gulp
-		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-		// .src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
+		// .src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+		.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
 		.pipe( sass({
@@ -181,26 +184,26 @@ const sassTask = ( done ) => {
 		.pipe( gulp.dest(projectCss) );
 
 	/* ----- No task runner ----- */
-	// gulp
-	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass({
-	// 		outputStyle: 'expanded',
-	// 		indentWidth: 1,
-	// 		indentType : 'tab',
-	// 	}) )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( gulp.dest(projectCss) );
+	gulp
+		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( bulkSass() )
+		.pipe( sass({
+			outputStyle: 'expanded',
+			indentWidth: 1,
+			indentType : 'tab',
+		}) )
+		.pipe( autoprefixer({
+			grid: true,
+			cascade: false,
+			remove: true,
+			overrideBrowserslist: [
+				'> 1% in JP',
+				'last 1 version',
+				'Firefox ESR'
+			]
+		}) )
+		.pipe( gulp.dest(projectCss) );
 
 	done();
 }
@@ -394,12 +397,12 @@ exports.sprite = spriteTask;
 ///////////////////////////////////////////////////////////////
 const jsTask = ( done ) => {
 	/* ----- basic ----- */
-	gulp
-		.src( devScript + '!(_|#|*.min)*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( uglify({ output: {comments: 'some'} }) )
-		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ));
+	// gulp
+	// 	.src( devScript + '!(_|#|*.min)*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( uglify({ output: {comments: 'some'} }) )
+	// 	.pipe( rename({extname: '.min.js'}) )
+	// 	.pipe( gulp.dest( projectScript ) );
 
 
 	/* ----- move ----- */
@@ -407,7 +410,7 @@ const jsTask = ( done ) => {
 		.src( devScript + '**.min.js' )
 		.pipe( changed( projectScript ) )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectScript ) );
 
 
 	/* ----- library ----- */
@@ -415,13 +418,33 @@ const jsTask = ( done ) => {
 		.src( devScript + 'library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('library.js') )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectScript ) );
+
+	/* filelist */
+	gulp
+		.src( devScript + 'library/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( filelist('library.txt',{
+			absolute: false,
+			relative: true,
+		}) )
+		.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 	gulp
 		.src( devScript + 'jquery-library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('jquery-library.js') )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectScript ) );
+
+	/* filelist */
+	gulp
+		.src( devScript + 'jquery-library/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( filelist('jquery-library.txt',{
+			absolute: false,
+			relative: true,
+		}) )
+		.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 
 	/* ----- module ----- */
@@ -431,20 +454,29 @@ const jsTask = ( done ) => {
 		.pipe( concat('module.js') )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ));
+		.pipe( gulp.dest( projectScript ) );
 
+	/* filelist */
+	gulp
+		.src( devScript + 'module/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( filelist('module.txt',{
+			absolute: false,
+			relative: true,
+		}) )
+		.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 	/* ----- No task runner ----- */
-	// gulp
-	// 	.src( devScript + '!(_|#|*.min)*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( gulp.dest( projectScript ));
+	gulp
+		.src( devScript + '!(_|#|*.min)*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( gulp.dest( projectScript ) );
 
-	// gulp
-	// 	.src( devScript + 'module/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( concat('module.js') )
-	// 	.pipe( gulp.dest( projectScript ));
+	gulp
+		.src( devScript + 'module/*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( concat('module.js') )
+		.pipe( gulp.dest( projectScript ) );
 
 
 	done();
@@ -492,7 +524,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.7.5'
+		+ "\n" + '   @version : 2.8.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
