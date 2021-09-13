@@ -3,7 +3,7 @@
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
  * @update  : 2021.09.11
- * @version : 2.8.0
+ * @version : 2.8.1
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -159,16 +159,12 @@ exports.ejs = ejsTask;
 // sass
 ///////////////////////////////////////////////////////////////
 const sassTask = ( done ) => {
+	/* ----- basic min ----- */
 	gulp
-		// .src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-		.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
+		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( bulkSass() )
-		.pipe( sass({
-			outputStyle: 'expanded',
-			indentWidth: 1,
-			indentType : 'tab',
-		}) )
+		.pipe( sass() )
 		.pipe( cleanCSS() )
 		.pipe( autoprefixer({
 			grid: true,
@@ -183,27 +179,50 @@ const sassTask = ( done ) => {
 		.pipe( rename({suffix: '.min'}) )
 		.pipe( gulp.dest(projectCss) );
 
+
+	/* ----- common min ----- */
+	// gulp
+	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( bulkSass() )
+	// 	.pipe( sass() )
+	// 	.pipe( cleanCSS() )
+	// 	.pipe( autoprefixer({
+	// 		grid: true,
+	// 		cascade: false,
+	// 		remove: true,
+	// 		overrideBrowserslist: [
+	// 			'> 1% in JP',
+	// 			'last 1 version',
+	// 			'Firefox ESR'
+	// 		]
+	// 	}) )
+	// 	.pipe( rename({suffix: '.min'}) )
+	// 	.pipe( gulp.dest(projectCss) );
+
+
 	/* ----- No task runner ----- */
-	gulp
-		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( bulkSass() )
-		.pipe( sass({
-			outputStyle: 'expanded',
-			indentWidth: 1,
-			indentType : 'tab',
-		}) )
-		.pipe( autoprefixer({
-			grid: true,
-			cascade: false,
-			remove: true,
-			overrideBrowserslist: [
-				'> 1% in JP',
-				'last 1 version',
-				'Firefox ESR'
-			]
-		}) )
-		.pipe( gulp.dest(projectCss) );
+	// gulp
+	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( bulkSass() )
+	// 	.pipe( sass({
+	// 		outputStyle: 'expanded',
+	// 		indentWidth: 1,
+	// 		indentType : 'tab',
+	// 	}) )
+	// 	.pipe( autoprefixer({
+	// 		grid: true,
+	// 		cascade: false,
+	// 		remove: true,
+	// 		overrideBrowserslist: [
+	// 			'> 1% in JP',
+	// 			'last 1 version',
+	// 			'Firefox ESR'
+	// 		]
+	// 	}) )
+	// 	.pipe( gulp.dest(projectCss) );
+
 
 	done();
 }
@@ -396,14 +415,13 @@ exports.sprite = spriteTask;
 // javascriptMin
 ///////////////////////////////////////////////////////////////
 const jsTask = ( done ) => {
-	/* ----- basic ----- */
-	// gulp
-	// 	.src( devScript + '!(_|#|*.min)*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( uglify({ output: {comments: 'some'} }) )
-	// 	.pipe( rename({extname: '.min.js'}) )
-	// 	.pipe( gulp.dest( projectScript ) );
-
+	/* ----- basic min ----- */
+	gulp
+		.src( devScript + '!(_|#|*.min)*.js' )
+		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+		.pipe( uglify({ output: {comments: 'some'} }) )
+		.pipe( rename({extname: '.min.js'}) )
+		.pipe( gulp.dest( projectScript ) );
 
 	/* ----- move ----- */
 	gulp
@@ -420,31 +438,11 @@ const jsTask = ( done ) => {
 		.pipe( concat('library.js') )
 		.pipe( gulp.dest( projectScript ) );
 
-	/* filelist */
-	gulp
-		.src( devScript + 'library/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( filelist('library.txt',{
-			absolute: false,
-			relative: true,
-		}) )
-		.pipe( gulp.dest( projectScript + 'filelist/' ) );
-
 	gulp
 		.src( devScript + 'jquery-library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('jquery-library.js') )
 		.pipe( gulp.dest( projectScript ) );
-
-	/* filelist */
-	gulp
-		.src( devScript + 'jquery-library/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( filelist('jquery-library.txt',{
-			absolute: false,
-			relative: true,
-		}) )
-		.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 
 	/* ----- module ----- */
@@ -456,27 +454,47 @@ const jsTask = ( done ) => {
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( projectScript ) );
 
-	/* filelist */
-	gulp
-		.src( devScript + 'module/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( filelist('module.txt',{
-			absolute: false,
-			relative: true,
-		}) )
-		.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 	/* ----- No task runner ----- */
-	gulp
-		.src( devScript + '!(_|#|*.min)*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( gulp.dest( projectScript ) );
+	// gulp
+	// 	.src( devScript + '!(_|#|*.min)*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( gulp.dest( projectScript ) );
 
-	gulp
-		.src( devScript + 'module/*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( concat('module.js') )
-		.pipe( gulp.dest( projectScript ) );
+	// gulp
+	// 	.src( devScript + 'module/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( concat('module.js') )
+	// 	.pipe( gulp.dest( projectScript ) );
+
+
+	/* ----- filelist ----- */
+	// gulp
+	// 	.src( devScript + 'library/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( filelist('library.txt',{
+	// 		absolute: false,
+	// 		relative: true,
+	// 	}) )
+	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
+
+	// gulp
+	// 	.src( devScript + 'jquery-library/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( filelist('jquery-library.txt',{
+	// 		absolute: false,
+	// 		relative: true,
+	// 	}) )
+	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
+
+	// gulp
+	// 	.src( devScript + 'module/*.js' )
+	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+	// 	.pipe( filelist('module.txt',{
+	// 		absolute: false,
+	// 		relative: true,
+	// 	}) )
+	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
 
 	done();
@@ -524,7 +542,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.8.0'
+		+ "\n" + '   @version : 2.8.1'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
