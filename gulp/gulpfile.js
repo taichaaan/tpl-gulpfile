@@ -291,7 +291,7 @@ const imgTask = ( done ) => {
 				return path;
 			}
 		}) )
-		.pipe( webp() )
+		.pipe( webp( {quality: 85} ) )
 		.pipe(rename(function (path) {
 			// ファイル名から「webp-」を削除
 			var basename = path.basename;
