@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.09.11
- * @version : 2.8.1
+ * @update  : 2021.09.21
+ * @version : 2.8.2
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -542,7 +542,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.8.1'
+		+ "\n" + '   @version : 2.8.2'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
