@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.09.21
- * @version : 2.8.2
+ * @update  : 2021.10.24
+ * @version : 2.9.0
  *
  * @license Copyright (C) 2021 Taichi Matsutaka
  */
@@ -235,9 +235,9 @@ exports.sass = sassTask;
 ///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgFile    = [ devImg + '!(_|#)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , devImg + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
-const devWebpFile   = [ devImg + '!(_|#)**/**/webp-*.+(jpg|jpeg|png|gif)' , devImg + 'webp-*.+(jpg|jpeg|png|gif)' ];
-const devImgSvgFile = [ devImg + '!(_|#)**/**/!(_|#)*.svg' , devImg + '!(_|#)*.svg' ];
+const devImgFile    = [ devImg + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , devImg + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
+const devWebpFile   = [ devImg + '!(_|#|meta)**/**/webp-*.+(jpg|jpeg|png|gif)' , devImg + 'webp-*.+(jpg|jpeg|png|gif)' ];
+const devImgSvgFile = [ devImg + '!(_|#|meta)**/**/!(_|#)*.svg' , devImg + '!(_|#)*.svg' ];
 
 const imgTask = ( done ) => {
 	/* ----- jpg,png,gif ----- */
@@ -516,6 +516,7 @@ const devMove = [
 	devHtml + '!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
 	devHtml + '!(_|#)**/**/!(_|#)apng*.+(png)',
 	devHtml + '!(_|#)apng*.+(png)',
+	devHtml + '**/meta/**/*.+(jpg|jpeg|png|gif|svg)',
 ];
 
 const moveTask = () => {
@@ -542,7 +543,7 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.8.2'
+		+ "\n" + '   @version : 2.9.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
