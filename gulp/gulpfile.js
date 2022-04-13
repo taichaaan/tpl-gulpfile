@@ -2,14 +2,18 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2021.10.24
- * @version : 2.9.0
+ * @update  : 2022.04.13
+ * @version : 2.10.0
  *
- * @license Copyright (C) 2021 Taichi Matsutaka
+ * @license Copyright (C) 2022 Taichi Matsutaka
  */
 ///////////////////////////////////////////////////////////////
 // variable
 ///////////////////////////////////////////////////////////////
+
+const type = 'min';
+// const type = 'normal';
+
 
 /* Project path.
 ------------------ */
@@ -159,70 +163,70 @@ exports.ejs = ejsTask;
 // sass
 ///////////////////////////////////////////////////////////////
 const sassTask = ( done ) => {
-	/* ----- basic min ----- */
-	gulp
-		.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( bulkSass() )
-		.pipe( sass() )
-		.pipe( cleanCSS() )
-		.pipe( autoprefixer({
-			grid: true,
-			cascade: false,
-			remove: true,
-			overrideBrowserslist: [
-				'> 1% in JP',
-				'last 1 version',
-				'Firefox ESR'
-			]
-		}) )
-		.pipe( rename({suffix: '.min'}) )
-		.pipe( gulp.dest(projectCss) );
+	if ( type == 'min' ) {
+		/* ----- basic min ----- */
+		gulp
+			.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( bulkSass() )
+			.pipe( sass() )
+			.pipe( cleanCSS() )
+			.pipe( autoprefixer({
+				grid: true,
+				cascade: false,
+				remove: true,
+				overrideBrowserslist: [
+					'> 1% in JP',
+					'last 1 version',
+					'Firefox ESR'
+				]
+			}) )
+			.pipe( rename({suffix: '.min'}) )
+			.pipe( gulp.dest(projectCss) );
+	} else{
+		/* ----- common min ----- */
+		gulp
+			.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( bulkSass() )
+			.pipe( sass() )
+			.pipe( cleanCSS() )
+			.pipe( autoprefixer({
+				grid: true,
+				cascade: false,
+				remove: true,
+				overrideBrowserslist: [
+					'> 1% in JP',
+					'last 1 version',
+					'Firefox ESR'
+				]
+			}) )
+			.pipe( rename({suffix: '.min'}) )
+			.pipe( gulp.dest(projectCss) );
 
 
-	/* ----- common min ----- */
-	// gulp
-	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass() )
-	// 	.pipe( cleanCSS() )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( rename({suffix: '.min'}) )
-	// 	.pipe( gulp.dest(projectCss) );
-
-
-	/* ----- No task runner ----- */
-	// gulp
-	// 	.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( bulkSass() )
-	// 	.pipe( sass({
-	// 		outputStyle: 'expanded',
-	// 		indentWidth: 1,
-	// 		indentType : 'tab',
-	// 	}) )
-	// 	.pipe( autoprefixer({
-	// 		grid: true,
-	// 		cascade: false,
-	// 		remove: true,
-	// 		overrideBrowserslist: [
-	// 			'> 1% in JP',
-	// 			'last 1 version',
-	// 			'Firefox ESR'
-	// 		]
-	// 	}) )
-	// 	.pipe( gulp.dest(projectCss) );
-
+		/* ----- No task runner ----- */
+		gulp
+			.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( bulkSass() )
+			.pipe( sass({
+				outputStyle: 'expanded',
+				indentWidth: 1,
+				indentType : 'tab',
+			}) )
+			.pipe( autoprefixer({
+				grid: true,
+				cascade: false,
+				remove: true,
+				overrideBrowserslist: [
+					'> 1% in JP',
+					'last 1 version',
+					'Firefox ESR'
+				]
+			}) )
+			.pipe( gulp.dest(projectCss) );
+	}
 
 	done();
 }
@@ -415,14 +419,6 @@ exports.sprite = spriteTask;
 // javascriptMin
 ///////////////////////////////////////////////////////////////
 const jsTask = ( done ) => {
-	/* ----- basic min ----- */
-	gulp
-		.src( devScript + '!(_|#|*.min)*.js' )
-		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( uglify({ output: {comments: 'some'} }) )
-		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ) );
-
 	/* ----- move ----- */
 	gulp
 		.src( devScript + '**.min.js' )
@@ -455,47 +451,57 @@ const jsTask = ( done ) => {
 		.pipe( gulp.dest( projectScript ) );
 
 
-	/* ----- No task runner ----- */
-	// gulp
-	// 	.src( devScript + '!(_|#|*.min)*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( gulp.dest( projectScript ) );
+	if ( type == 'min' ) {
+		/* ----- basic min ----- */
+		gulp
+			.src( devScript + '!(_|#|*.min)*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( uglify({ output: {comments: 'some'} }) )
+			.pipe( rename({extname: '.min.js'}) )
+			.pipe( gulp.dest( projectScript ) );
 
-	// gulp
-	// 	.src( devScript + 'module/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( concat('module.js') )
-	// 	.pipe( gulp.dest( projectScript ) );
+	} else{
+		/* ----- No task runner ----- */
+		gulp
+			.src( devScript + '!(_|#|*.min)*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( gulp.dest( projectScript ) );
+
+		gulp
+			.src( devScript + 'module/*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( concat('module.js') )
+			.pipe( gulp.dest( projectScript ) );
 
 
-	/* ----- filelist ----- */
-	// gulp
-	// 	.src( devScript + 'library/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( filelist('library.txt',{
-	// 		absolute: false,
-	// 		relative: true,
-	// 	}) )
-	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
+		/* ----- filelist ----- */
+		gulp
+			.src( devScript + 'library/*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( filelist('library.txt',{
+				absolute: false,
+				relative: true,
+			}) )
+			.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
-	// gulp
-	// 	.src( devScript + 'jquery-library/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( filelist('jquery-library.txt',{
-	// 		absolute: false,
-	// 		relative: true,
-	// 	}) )
-	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
+		gulp
+			.src( devScript + 'jquery-library/*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( filelist('jquery-library.txt',{
+				absolute: false,
+				relative: true,
+			}) )
+			.pipe( gulp.dest( projectScript + 'filelist/' ) );
 
-	// gulp
-	// 	.src( devScript + 'module/*.js' )
-	// 	.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-	// 	.pipe( filelist('module.txt',{
-	// 		absolute: false,
-	// 		relative: true,
-	// 	}) )
-	// 	.pipe( gulp.dest( projectScript + 'filelist/' ) );
-
+		gulp
+			.src( devScript + 'module/*.js' )
+			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
+			.pipe( filelist('module.txt',{
+				absolute: false,
+				relative: true,
+			}) )
+			.pipe( gulp.dest( projectScript + 'filelist/' ) );
+	}
 
 	done();
 }
