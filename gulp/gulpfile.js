@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2022.04.13
- * @version : 2.10.0
+ * @update  : 2022.04.19
+ * @version : 2.11.0
  *
  * @license Copyright (C) 2022 Taichi Matsutaka
  */
@@ -11,34 +11,37 @@
 // variable
 ///////////////////////////////////////////////////////////////
 
-const type = 'min';
-// const type = 'normal';
+///////////////////////////////////////////
+// options
+///////////////////////////////////////////
+const options = {
+	// type: 'min',
+	type: 'normal',
+	devPath: {
+		root  : '../dev_html/', // Path to dev webroot.
+		assets: '../dev_html/assets/', // Path to dev assets.
+		img   : '../dev_html/assets/img/', // Path to project original img.
+		sprite: '../dev_html/assets/sprite/', // Path to project original svg.
+		sass  : '../dev_html/assets/sass/', // Path to project sass.
+		script: '../dev_html/assets/js/', // Path to project original js.
+		html  : '../dev_html/', // Path to project original html.
+	},
+	publicPath: {
+		root  : '../../public_html/',// Path to project webroot.
+		assets: '../../public_html/assets/',// Path to project assets.
+		img   : '../../public_html/assets/img/',// Path to project img.
+		sprite: '../../public_html/assets/sprite/',// Path to project svg.
+		css   : '../../public_html/assets/css/',// Path to project css.
+		script: '../../public_html/assets/js/',// Path to project javascript.
+		html  : '../../public_html/',// Path to project HTML.
+	},
+}
 
 
-/* Project path.
------------------- */
-const devRoot   = '../dev_html/'; // Path to dev webroot.
-const devAssets = devRoot + 'assets' + '/'; // Path to dev assets.
-const devImg    = devAssets + 'img' + '/'; // Path to project original img.
-const devSprite = devAssets + 'sprite' + '/'; // Path to project original svg.
-const devSass   = devAssets + 'sass' + '/'; // Path to project sass.
-const devScript = devAssets + 'js' + '/'; // Path to project original js.
-const devHtml   = devRoot; // Path to project original html.
-const devWp     = devRoot + 'wp' + '/'; // Path to project original wordpress.
 
-const projectRoot   = '../../public_html/'; // Path to project webroot.
-const projectAssets = projectRoot + 'assets' + '/'; // Path to project assets.
-const projectImg    = projectAssets + 'img' + '/'; // Path to project img.
-const projectSprite = projectAssets + 'sprite' + '/'; // Path to project svg.
-const projectCss    = projectAssets + 'css' + '/'; // Path to project css.
-const projectScript = projectAssets + 'js' + '/'; // Path to project javascript.
-const projectHtml   = projectRoot; // Path to project HTML.
-const projectWp     = projectRoot + 'wp' + '/'; // Path to project wordpress.
-
-
-/* gulp
------------------- */
-// Gulp.
+///////////////////////////////////////////
+// gulp
+/////////////////////////////////////////////
 const gulp = require('gulp');
 
 // common
@@ -98,7 +101,7 @@ const filelist = require('gulp-filelist');
 ///////////////////////////////////////////////////////////////
 const pugTask = () => {
 	return gulp
-		.src( [ devHtml + '!(_|#)**/**/!(_|#)*.pug' , devHtml + '!(_|#)*.pug' ] )
+		.src( [ options.devPath.html + '!(_|#)**/**/!(_|#)*.pug' , options.devPath.html + '!(_|#)*.pug' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( pug({
 			pretty: true
@@ -122,7 +125,7 @@ const pugTask = () => {
 		.pipe( rename({
 			extname: '.php'
 		}) )
-		.pipe( gulp.dest( projectHtml ) );
+		.pipe( gulp.dest( options.publicPath.html ) );
 }
 exports.pug = pugTask;
 
@@ -135,7 +138,7 @@ exports.pug = pugTask;
 ///////////////////////////////////////////////////////////////
 const ejsTask = () => {
 	return gulp
-		.src( [ devHtml + '!(_|#)**/**/!(_|#)*.ejs' , devHtml + '!(_|#)*.ejs' ] )
+		.src( [ options.devPath.html + '!(_|#)**/**/!(_|#)*.ejs' , options.devPath.html + '!(_|#)*.ejs' ] )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( ejs() )
 		.pipe( htmlbeautify({
@@ -151,7 +154,7 @@ const ejsTask = () => {
 		.pipe( rename({
 			extname: '.php'
 		}) )
-		.pipe( gulp.dest( projectHtml ) );
+		.pipe( gulp.dest( options.publicPath.html ) );
 }
 exports.ejs = ejsTask;
 
@@ -163,10 +166,10 @@ exports.ejs = ejsTask;
 // sass
 ///////////////////////////////////////////////////////////////
 const sassTask = ( done ) => {
-	if ( type == 'min' ) {
+	if ( options.type == 'min' ) {
 		/* ----- basic min ----- */
 		gulp
-			.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+			.src( [ options.devPath.sass + '!(_|#)**/**/!(_|#)*.scss' , options.devPath.sass + '!(_|#)*.scss' ] , { sourcemaps: true } )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( bulkSass() )
 			.pipe( sass() )
@@ -182,11 +185,11 @@ const sassTask = ( done ) => {
 				]
 			}) )
 			.pipe( rename({suffix: '.min'}) )
-			.pipe( gulp.dest(projectCss) );
+			.pipe( gulp.dest( options.publicPath.css , { sourcemaps:'./sourcemaps/'} ) );
 	} else{
 		/* ----- common min ----- */
 		gulp
-			.src( [ devSass + '!(_|#)**/**/!(_|#)common.scss' , devSass + '!(_|#)common.scss' ] )
+			.src( [ options.devPath.sass + '!(_|#)**/**/!(_|#)common.scss' , options.devPath.sass + '!(_|#)common.scss' ] , { sourcemaps: true } )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( bulkSass() )
 			.pipe( sass() )
@@ -202,12 +205,12 @@ const sassTask = ( done ) => {
 				]
 			}) )
 			.pipe( rename({suffix: '.min'}) )
-			.pipe( gulp.dest(projectCss) );
+			.pipe( gulp.dest( options.publicPath.css , { sourcemaps:'./sourcemaps/'} ) );
 
 
 		/* ----- No task runner ----- */
 		gulp
-			.src( [ devSass + '!(_|#)**/**/!(_|#)*.scss' , devSass + '!(_|#)*.scss' ] )
+			.src( [ options.devPath.sass + '!(_|#)**/**/!(_|#)*.scss' , options.devPath.sass + '!(_|#)*.scss' ] , { sourcemaps: true } )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( bulkSass() )
 			.pipe( sass({
@@ -225,7 +228,7 @@ const sassTask = ( done ) => {
 					'Firefox ESR'
 				]
 			}) )
-			.pipe( gulp.dest(projectCss) );
+			.pipe( gulp.dest( options.publicPath.css , { sourcemaps:'./sourcemaps/'} ) );
 	}
 
 	done();
@@ -239,15 +242,15 @@ exports.sass = sassTask;
 ///////////////////////////////////////////////////////////////
 // imageMin
 ///////////////////////////////////////////////////////////////
-const devImgFile    = [ devImg + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , devImg + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
-const devWebpFile   = [ devImg + '!(_|#|meta)**/**/webp-*.+(jpg|jpeg|png|gif)' , devImg + 'webp-*.+(jpg|jpeg|png|gif)' ];
-const devImgSvgFile = [ devImg + '!(_|#|meta)**/**/!(_|#)*.svg' , devImg + '!(_|#)*.svg' ];
+const devImgFile    = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , options.devPath.img + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
+const devWebpFile   = [ options.devPath.img + '!(_|#|meta)**/**/webp-*.+(jpg|jpeg|png|gif)' , options.devPath.img + 'webp-*.+(jpg|jpeg|png|gif)' ];
+const devImgSvgFile = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#)*.svg' , options.devPath.img + '!(_|#)*.svg' ];
 
 const imgTask = ( done ) => {
 	/* ----- jpg,png,gif ----- */
 	gulp
 		.src( devImgFile )
-		.pipe( changed( projectImg ) )
+		.pipe( changed( options.publicPath.img ) )
 		.pipe( imagemin([
 			imageminPng(),
 			imageminJpg(),
@@ -259,13 +262,13 @@ const imgTask = ( done ) => {
 		],{
 			verbose: true
 		}) )
-		.pipe( gulp.dest( projectImg ) );
+		.pipe( gulp.dest( options.publicPath.img ) );
 
 
 	/* ----- img/*.svg ----- */
 	gulp
 		.src( devImgSvgFile )
-		.pipe( changed( projectImg ) )
+		.pipe( changed( options.publicPath.img ) )
 		.pipe( imagemin([
 			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
 		],{
@@ -282,14 +285,14 @@ const imgTask = ( done ) => {
 				xmlMode: true,
 			}
 		}) )
-		.pipe( gulp.dest( projectImg ) );
+		.pipe( gulp.dest( options.publicPath.img ) );
 
 
 
 	/* ----- webp ----- */
 	gulp
 		.src( devWebpFile )
-		.pipe( changed( projectImg , {
+		.pipe( changed( options.publicPath.img , {
 			transformPath: function( newPath ) {
 				const path = newPath.replace( 'webp-', '' );
 				return path;
@@ -302,11 +305,11 @@ const imgTask = ( done ) => {
 			var filename = basename.replace( 'webp-', '' );
 			path.basename = filename;
 		}))
-		.pipe( gulp.dest( projectImg ) );
+		.pipe( gulp.dest( options.publicPath.img ) );
 
 	gulp
 		.src( devWebpFile )
-		.pipe( changed( projectImg , {
+		.pipe( changed( options.publicPath.img , {
 			transformPath: function( newPath ) {
 				const path = newPath.replace( 'webp-', '' );
 				return path;
@@ -329,7 +332,7 @@ const imgTask = ( done ) => {
 			var filename = basename.replace( 'webp-', '' );
 			path.basename = filename;
 		}))
-		.pipe( gulp.dest( projectImg ) );
+		.pipe( gulp.dest( options.publicPath.img ) );
 
 
 	done();
@@ -344,7 +347,7 @@ exports.img = imgTask;
 ///////////////////////////////////////////////////////////////
 // spriteTask
 ///////////////////////////////////////////////////////////////
-const devSpriteFile = [ devSprite + '!(_|#)**/**/!(_|#)*.svg' , devSprite + '!(_|#)*.svg' ];
+const devSpriteFile = [ options.devPath.sprite + '!(_|#)**/**/!(_|#)*.svg' , options.devPath.sprite + '!(_|#)*.svg' ];
 
 const spriteTask = ( done ) => {
 
@@ -352,19 +355,19 @@ const spriteTask = ( done ) => {
 	/* 開発ディレクトリを使わない会社用に、public_htmlにもpartsディレクトリで圧縮した個別のsvgファイルを追加 */
 	gulp
 		.src( devSpriteFile )
-		.pipe( changed( projectSprite ) )
+		.pipe( changed( options.publicPath.sprite ) )
 		.pipe( imagemin([
 			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
 		],{
 			verbose: true
 		}) )
-		.pipe( gulp.dest( projectSprite + 'parts/' ) );
+		.pipe( gulp.dest( options.publicPath.sprite + 'parts/' ) );
 
 
 	/* ----- sprite.svg ----- */
 	gulp
 		.src( devSpriteFile )
-		.pipe( changed( projectSprite ) )
+		.pipe( changed( options.publicPath.sprite ) )
 		.pipe( imagemin([
 			imagemin.svgo( { plugins: [ { removeViewBox: false } ] } ),
 		],{
@@ -405,7 +408,7 @@ const spriteTask = ( done ) => {
 			'extra_liners'         : [],
 			'end_with_newline'     : true
 		}))
-		.pipe( gulp.dest( projectSprite ) );
+		.pipe( gulp.dest( options.publicPath.sprite ) );
 
 	done();
 }
@@ -421,86 +424,86 @@ exports.sprite = spriteTask;
 const jsTask = ( done ) => {
 	/* ----- move ----- */
 	gulp
-		.src( devScript + '**.min.js' )
-		.pipe( changed( projectScript ) )
+		.src( options.devPath.script + '**.min.js' )
+		.pipe( changed( options.publicPath.script ) )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( gulp.dest( projectScript ) );
+		.pipe( gulp.dest( options.publicPath.script ) );
 
 
 	/* ----- library ----- */
 	gulp
-		.src( devScript + 'library/*.js' )
+		.src( options.devPath.script + 'library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('library.js') )
-		.pipe( gulp.dest( projectScript ) );
+		.pipe( gulp.dest( options.publicPath.script ) );
 
 	gulp
-		.src( devScript + 'jquery-library/*.js' )
+		.src( options.devPath.script + 'jquery-library/*.js' )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('jquery-library.js') )
-		.pipe( gulp.dest( projectScript ) );
+		.pipe( gulp.dest( options.publicPath.script ) );
 
 
 	/* ----- module ----- */
 	gulp
-		.src( devScript + 'module/*.js' )
+		.src( options.devPath.script + 'module/*.js' , { sourcemaps: true } )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
-		.pipe( gulp.dest( projectScript ) );
+		.pipe( gulp.dest( options.publicPath.script ) , { sourcemaps: './sourcemaps/'} );
 
 
-	if ( type == 'min' ) {
+	if ( options.type == 'min' ) {
 		/* ----- basic min ----- */
 		gulp
-			.src( devScript + '!(_|#|*.min)*.js' )
+			.src( options.devPath.script + '!(_|#|*.min)*.js' , { sourcemaps: true } )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( uglify({ output: {comments: 'some'} }) )
 			.pipe( rename({extname: '.min.js'}) )
-			.pipe( gulp.dest( projectScript ) );
+			.pipe( gulp.dest( options.publicPath.script ) , { sourcemaps: './sourcemaps/'} );
 
 	} else{
 		/* ----- No task runner ----- */
 		gulp
-			.src( devScript + '!(_|#|*.min)*.js' )
+			.src( options.devPath.script + '!(_|#|*.min)*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-			.pipe( gulp.dest( projectScript ) );
+			.pipe( gulp.dest( options.publicPath.script ) );
 
 		gulp
-			.src( devScript + 'module/*.js' )
+			.src( options.devPath.script + 'module/*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( concat('module.js') )
-			.pipe( gulp.dest( projectScript ) );
+			.pipe( gulp.dest( options.publicPath.script ) );
 
 
 		/* ----- filelist ----- */
 		gulp
-			.src( devScript + 'library/*.js' )
+			.src( options.devPath.script + 'library/*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( filelist('library.txt',{
 				absolute: false,
 				relative: true,
 			}) )
-			.pipe( gulp.dest( projectScript + 'filelist/' ) );
+			.pipe( gulp.dest( options.publicPath.script + 'filelist/' ) );
 
 		gulp
-			.src( devScript + 'jquery-library/*.js' )
+			.src( options.devPath.script + 'jquery-library/*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( filelist('jquery-library.txt',{
 				absolute: false,
 				relative: true,
 			}) )
-			.pipe( gulp.dest( projectScript + 'filelist/' ) );
+			.pipe( gulp.dest( options.publicPath.script + 'filelist/' ) );
 
 		gulp
-			.src( devScript + 'module/*.js' )
+			.src( options.devPath.script + 'module/*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( filelist('module.txt',{
 				absolute: false,
 				relative: true,
 			}) )
-			.pipe( gulp.dest( projectScript + 'filelist/' ) );
+			.pipe( gulp.dest( options.publicPath.script + 'filelist/' ) );
 	}
 
 	done();
@@ -518,21 +521,22 @@ exports.js = gulp.series(
 // move
 ///////////////////////////////////////////////////////////////
 const devMove = [
-	devHtml + '!(_|#)**/**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
-	devHtml + '!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
-	devHtml + '!(_|#)**/**/!(_|#)apng*.+(png)',
-	devHtml + '!(_|#)apng*.+(png)',
-	devHtml + '**/meta/**/*.+(jpg|jpeg|png|gif|svg)',
+	options.devPath.html + '!(_|#)**/**/!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	options.devPath.html + '!(_|#)*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)',
+	options.devPath.html + '!(_|#)**/**/!(_|#)apng*.+(png)',
+	options.devPath.html + '!(_|#)apng*.+(png)',
+	options.devPath.html + '**/meta/**/*.+(jpg|jpeg|png|gif|svg)',
 ];
 
 const moveTask = () => {
 	return gulp
 		.src( devMove )
-		.pipe( changed( projectHtml ) )
+		.pipe( changed( options.publicPath.html ) )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-		.pipe( gulp.dest( projectHtml ) );
+		.pipe( gulp.dest( options.publicPath.html ) );
 }
 exports.move = moveTask;
+
 
 
 
@@ -559,13 +563,13 @@ const watchTask = () => {
 		+ "\n"
 	);
 
-	gulp.watch( devRoot + '**/*.pug' , gulp.parallel( pugTask ) );
-	gulp.watch( devRoot + '**/*.ejs' , gulp.parallel( ejsTask ) );
-	gulp.watch( devSass + '**/*.scss' , gulp.parallel( sassTask ) );
-	gulp.watch( devScript + '**/*.js' , gulp.parallel( jsTask ) );
-	gulp.watch( devImg + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
-	gulp.watch( devSprite + '**/*.svg' , gulp.parallel( spriteTask ) );
-	gulp.watch( devRoot + '**/*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)' , gulp.parallel( moveTask ) );
+	gulp.watch( options.devPath.root + '**/*.pug' , gulp.parallel( pugTask ) );
+	gulp.watch( options.devPath.root + '**/*.ejs' , gulp.parallel( ejsTask ) );
+	gulp.watch( options.devPath.sass + '**/*.scss' , gulp.parallel( sassTask ) );
+	gulp.watch( options.devPath.script + '**/*.js' , gulp.parallel( jsTask ) );
+	gulp.watch( options.devPath.img + '**/*.+(jpg|jpeg|png|gif|svg)' , gulp.parallel( imgTask ) );
+	gulp.watch( options.devPath.sprite + '**/*.svg' , gulp.parallel( spriteTask ) );
+	gulp.watch( options.devPath.root + '**/*.+(php|css|mp4|mp3|mov|m4a|txt|pdf|ttf|eot|woff|woff2|ico|webp)' , gulp.parallel( moveTask ) );
 }
 exports.watch = watchTask;
 
@@ -588,6 +592,8 @@ exports.default = gulp.series(
 		watchTask,
 	)
 );
+
+
 
 
 
