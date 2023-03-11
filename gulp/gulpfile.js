@@ -292,23 +292,12 @@ const imgTask = ( done ) => {
 	/* ----- webp ----- */
 	gulp
 		.src( devWebpFile )
-		.pipe( changed( options.publicPath.img , {
-			transformPath: function( newPath ) {
-				const path = newPath.replace( 'webp-', '' );
-				return path;
-			}
-		}) )
-		.pipe( webp( {quality: 85} ) )
 		.pipe(rename(function (path) {
 			// ファイル名から「webp-」を削除
 			var basename = path.basename;
 			var filename = basename.replace( 'webp-', '' );
 			path.basename = filename;
 		}))
-		.pipe( gulp.dest( options.publicPath.img ) );
-
-	gulp
-		.src( devWebpFile )
 		.pipe( changed( options.publicPath.img , {
 			transformPath: function( newPath ) {
 				const path = newPath.replace( 'webp-', '' );
@@ -326,12 +315,8 @@ const imgTask = ( done ) => {
 		],{
 			verbose: true
 		}) )
-		.pipe(rename(function (path) {
-			// ファイル名から「webp-」を削除
-			var basename = path.basename;
-			var filename = basename.replace( 'webp-', '' );
-			path.basename = filename;
-		}))
+		.pipe( gulp.dest( options.publicPath.img ) )
+		.pipe( webp( {quality: 85} ) )
 		.pipe( gulp.dest( options.publicPath.img ) );
 
 
