@@ -2,10 +2,10 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2023.03.11
- * @version : 2.12.0
+ * @update  : 2024.02.08
+ * @version : 2.13.0
  *
- * @license Copyright (C) 2023 Taichi Matsutaka
+ * @license Copyright (C) 2018 - 2024 Taichi Matsutaka
  */
 /**************************************************************
  * variable
@@ -24,6 +24,7 @@ const options = {
 		sprite: '../dev_html/assets/sprite/', // Path to project original svg.
 		sass  : '../dev_html/assets/sass/', // Path to project sass.
 		script: '../dev_html/assets/js/', // Path to project original js.
+		video: '../dev_html/assets/video/', // Path to project original video.
 		html  : '../dev_html/', // Path to project original html.
 	},
 	publicPath: {
@@ -33,6 +34,7 @@ const options = {
 		sprite: '../../public_html/assets/sprite/',// Path to project svg.
 		css   : '../../public_html/assets/css/',// Path to project css.
 		script: '../../public_html/assets/js/',// Path to project javascript.
+		video : '../../public_html/assets/video/',// Path to project video.
 		html  : '../../public_html/',// Path to project HTML.
 	},
 }
@@ -238,9 +240,10 @@ exports.sass = sassTask;
 /**************************************************************
  * Image
 **************************************************************/
-const devImgFile    = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' , options.devPath.img + '!(_|#|apng|webp-)*.+(jpg|jpeg|png|gif)' ];
-const devWebpFile   = [ options.devPath.img + '!(_|#|meta)**/**/webp-*.+(jpg|jpeg|png|gif)' , options.devPath.img + 'webp-*.+(jpg|jpeg|png|gif)' ];
-const devImgSvgFile = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#)*.svg' , options.devPath.img + '!(_|#)*.svg' ];
+const devImgFile        = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(gif)' , options.devPath.img + '!(_|#|apng|webp-)*.+(gif)' ];
+const devWebpFile       = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png)' , options.devPath.img + '!(_|#|apng|webp-)*.+(jpg|jpeg|png)' ];
+const devImgSvgFile     = [ options.devPath.img + '!(_|#|meta)**/**/!(_|#)*.svg' , options.devPath.img + '!(_|#)*.svg' ];
+const devVideoImageFile = [ options.devPath.video + '!(_|#|meta)**/**/!(_|#|apng|webp-)*.+(jpg|jpeg|png)' , options.devPath.video + '!(_|#|apng|webp-)*.+(jpg|jpeg|png)' ];
 
 const imgTask = ( done ) => {
 	/* ----- jpg,png,gif ----- */
@@ -288,32 +291,15 @@ const imgTask = ( done ) => {
 	/* ----- webp ----- */
 	gulp
 		.src( devWebpFile )
-		.pipe(rename(function (path) {
-			// ファイル名から「webp-」を削除
-			var basename = path.basename;
-			var filename = basename.replace( 'webp-', '' );
-			path.basename = filename;
-		}))
-		.pipe( changed( options.publicPath.img , {
-			transformPath: function( newPath ) {
-				const path = newPath.replace( 'webp-', '' );
-				return path;
-			}
-		}) )
-		.pipe( imagemin([
-			imageminPng(),
-			imageminJpg(),
-			imageminGif({
-				interlaced: false,
-				optimizationLevel: 3,
-				colors:180
-			})
-		],{
-			verbose: true
-		}) )
-		.pipe( gulp.dest( options.publicPath.img ) )
 		.pipe( webp( {quality: 85} ) )
 		.pipe( gulp.dest( options.publicPath.img ) );
+
+
+	/* ----- video webp ----- */
+	gulp
+		.src( devVideoImageFile )
+		.pipe( webp( {quality: 85} ) )
+		.pipe( gulp.dest( options.publicPath.video ) );
 
 
 	done();
@@ -534,11 +520,11 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,ejs,sass,js,img,sprite,move'
-		+ "\n" + '   @version : 2.12.0'
+		+ "\n" + '   @version : 2.13.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
 		+ "\n"
-		+ "\n" + '   Copyright (C) 2023 Taichi Matsutaka'
+		+ "\n" + '   Copyright (C) 2018 - 2024 Taichi Matsutaka'
 		+ "\n"
 		+ "\n" + '------------------------------------------------- Now Watching --'
 		+ "\n"
