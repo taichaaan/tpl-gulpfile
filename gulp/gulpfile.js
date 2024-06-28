@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2024.04.25
- * @version : 2.14.0
+ * @update  : 2024.06.28
+ * @version : 2.15.0
  *
  * @license Copyright (C) 2018 - 2024 Taichi Matsutaka
  */
@@ -52,6 +52,7 @@ const plumber    = require('gulp-plumber'); // Do not stop watch even if an erro
 const notify     = require('gulp-notify'); // Display notification on desktop.
 const rename     = require('gulp-rename'); // File rename.
 const concat     = require('gulp-concat'); // Combine multiple file.
+const header     = require('gulp-header');
 
 
 // Sass plugin.
@@ -80,6 +81,8 @@ const uglify = require('gulp-uglify-es').default; // Compress javascript file.
 // Filelist
 const filelist = require('gulp-filelist');
 
+
+const currentYear = new Date().getFullYear();
 
 
 
@@ -306,6 +309,16 @@ const jsTask = ( done ) => {
 		.src( options.devPath.script + 'module/*.js' , { sourcemaps: true } )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
+		.pipe( header(`/**!
+ *
+ * module.min.js
+ *
+ * @license Copyright (C) ${currentYear} Taichi Matsutaka
+ * All rights reserved.
+ * This code is proprietary and confidential.
+ * Unauthorized copying, sharing, distribution, or use of this code in any form is strictly prohibited.
+ *
+ */\n`) )
 		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( options.publicPath.script ) , { sourcemaps: './sourcemaps/'} );
@@ -331,6 +344,16 @@ const jsTask = ( done ) => {
 			.src( options.devPath.script + 'module/*.js' )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 			.pipe( concat('module.js') )
+		.pipe( header(`/**!
+ *
+ * module.js
+ *
+ * @license Copyright (C) ${currentYear} Taichi Matsutaka
+ * All rights reserved.
+ * This code is proprietary and confidential.
+ * Unauthorized copying, sharing, distribution, or use of this code in any form is strictly prohibited.
+ *
+ */\n`) )
 			.pipe( gulp.dest( options.publicPath.script ) );
 
 
@@ -402,9 +425,10 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.14.0'
+		+ "\n" + '   @version : 2.15.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
+		+ "\n" + '   @update  : 2024.06.28'
 		+ "\n"
 		+ "\n" + '   Copyright (C) 2018 - 2024 Taichi Matsutaka'
 		+ "\n"
