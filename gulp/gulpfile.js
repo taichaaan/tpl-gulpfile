@@ -2,8 +2,8 @@
  * gulpfile.js
  * @ url    : https://github.com/taichaaan/tpl-gulpfile/
  * @creation: 2018.??.??
- * @update  : 2024.06.28
- * @version : 2.15.0
+ * @update  : 2024.08.15
+ * @version : 2.16.0
  *
  * @license Copyright (C) 2018 - 2024 Taichi Matsutaka
  */
@@ -309,6 +309,7 @@ const jsTask = ( done ) => {
 		.src( options.devPath.script + 'module/*.js' , { sourcemaps: true } )
 		.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
 		.pipe( concat('module.js') )
+		.pipe( uglify({ output: {comments: false} }) )
 		.pipe( header(`/**!
  *
  * module.min.js
@@ -319,7 +320,6 @@ const jsTask = ( done ) => {
  * Unauthorized copying, sharing, distribution, or use of this code in any form is strictly prohibited.
  *
  */\n`) )
-		.pipe( uglify({ output: {comments: 'some'} }) )
 		.pipe( rename({extname: '.min.js'}) )
 		.pipe( gulp.dest( options.publicPath.script ) , { sourcemaps: './sourcemaps/'} );
 
@@ -329,7 +329,7 @@ const jsTask = ( done ) => {
 		gulp
 			.src( options.devPath.script + '!(_|#|*.min)*.js' , { sourcemaps: true } )
 			.pipe( plumber({ errorHandler: notify.onError("Error: <%= error.message %>") }) )
-			.pipe( uglify({ output: {comments: 'some'} }) )
+			.pipe( uglify({ output: {comments: false} }) )
 			.pipe( rename({extname: '.min.js'}) )
 			.pipe( gulp.dest( options.publicPath.script ) , { sourcemaps: './sourcemaps/'} );
 
@@ -425,10 +425,10 @@ const watchTask = () => {
 		+ "\n"
 		+ "\n" + '   @name    : gulp watch'
 		+ "\n" + '   @task    : pug,sass,js,img,move'
-		+ "\n" + '   @version : 2.15.0'
+		+ "\n" + '   @version : 2.16.0'
 		+ "\n" + '   @gulp    : 4.0.2'
 		+ "\n" + '   @node    : 14.14.0'
-		+ "\n" + '   @update  : 2024.06.28'
+		+ "\n" + '   @update  : 2024.08.15'
 		+ "\n"
 		+ "\n" + '   Copyright (C) 2018 - 2024 Taichi Matsutaka'
 		+ "\n"
